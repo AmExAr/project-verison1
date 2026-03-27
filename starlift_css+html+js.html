@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARLIFT | Сбер Спикеры</title>
+    <title>STARLIFT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,57 +11,57 @@
             --sber-green: #0A803B;
             --sber-green-hover: #08662A;
             --light-green: #f0fff5;
-            --row-alt-green: #F0FDF4;
+            --row-alt-green: rgba(240, 253, 244, 0.6);
             --bg-color: #F2FBF5;
-            --white: #EAFFF5;
+            --white: rgba(234, 255, 245, 0.5);
             --text-main: #14251C;
-            --border-color: #BBF7D0;
+            --border-color: rgba(187, 247, 208, 0.6);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);            
             --text-muted: #70757a;
-            --nav-hover: #F0F2F5;
-            --dropdown-hover: #F8F9FA;
-            --th-bg: rgba(248, 249, 250, 0.8);
-            --tr-hover: rgba(255,255,255,1);
+            --nav-hover: rgba(240, 242, 245, 0.5);
+            --dropdown-hover: rgba(248, 249, 250, 0.8);
+            --th-bg: rgba(248, 249, 250, 0.6);
+            --tr-hover: rgba(255, 255, 255, 0.5);
             --mesh-1: #daffe5;
             --mesh-2: #d8f8e7;
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(224, 224, 224, 0.5);
-            --status-past-bg: #F1F3F4;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(224, 224, 224, 0.4);
+            --status-past-bg: rgba(241, 243, 244, 0.8);
             --status-past-color: #5F6368;
-            --status-future-bg: #E8F5E9;
+            --status-future-bg: rgba(232, 245, 233, 0.8);
             --status-future-color: #0A803B;
         }
 
         [data-theme="dark"] {
             --sber-green: #21A038;
             --sber-green-hover: #2EBD49;
-            --light-green: #152E20;
-            --row-alt-green: #1A221E;
+            --light-green: rgba(21, 46, 32, 0.6);
+            --row-alt-green: rgba(26, 34, 30, 0.6);
             /* Dark theme stays "deep green/graphite", not pure black */
             --bg-color: #0E1512;
-            --white: #141D19;
+            --white: rgba(20, 29, 25, 0.5);
             --text-main: #E8E8E8;
-            --border-color: #2A3B32;
+            --border-color: rgba(42, 59, 50, 0.6);
             
             --text-muted: #A0A5AA;
-            --nav-hover: #2A2A2A;
-            --dropdown-hover: #2A2A2A;
-            --th-bg: rgba(40, 40, 40, 0.8);
-            --tr-hover: #2D2D2D;
+            --nav-hover: rgba(42, 42, 42, 0.5);
+            --dropdown-hover: rgba(42, 42, 42, 0.8);
+            --th-bg: rgba(40, 40, 40, 0.6);
+            --tr-hover: rgba(45, 45, 45, 0.5);
             --mesh-1: #0B1812;
             --mesh-2: #07120E;
-            --glass-bg: rgba(30, 30, 30, 0.8);
-            --glass-border: rgba(80, 80, 80, 0.5);
-            --status-past-bg: #2C3033;
+            --glass-bg: rgba(30, 30, 30, 0.4);
+            --glass-border: rgba(80, 80, 80, 0.4);
+            --status-past-bg: rgba(44, 48, 51, 0.8);
             --status-past-color: #A0A5AA;
-            --status-future-bg: #152E20;
+            --status-future-bg: rgba(21, 46, 32, 0.8);
             --status-future-color: #21A038;
         }
 
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            background-color: var(--white);
+            background-color: transparent;
             color: var(--text-main);
             display: flex;
             height: 100vh;
@@ -95,19 +95,72 @@
             from { opacity: 1; }
             to { opacity: 0; }
         }
-        .animate-fade { animation: fadeInUp 0.5s ease forwards; }
+        .animate-fade { 
+            animation: fadeInUp 0.3s ease both; 
+        }
 
         aside {
             width: 250px;
-            background-color: var(--white);
-            border-right: 1px solid var(--border-color);
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-right: 1px solid var(--glass-border);
             display: flex;
             flex-direction: column;
             padding: 24px 15px;
             box-sizing: border-box;
             justify-content: space-between;
             z-index: 10;
-            transition: background-color 0.3s, border-color 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        aside.collapsed {
+            width: 80px;
+            padding: 24px 10px;
+        }
+
+        aside.collapsed .logo-text, 
+        aside.collapsed .nav-item span {
+            display: none;
+        }
+
+        aside.collapsed .nav-item {
+            justify-content: center;
+        }
+
+        aside.collapsed .sidebar-bottom-logo {
+            display: none;
+        }
+
+        .sidebar-toggle-btn {
+            position: absolute;
+            right: -15px;
+            top: 30px;
+            width: 30px;
+            height: 30px;
+            background: var(--sber-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            border: 2px solid var(--glass-bg);
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        aside.collapsed .sidebar-toggle-btn i {
+            transform: rotate(180deg);
         }
 
         .logo-container {
@@ -138,7 +191,7 @@
             gap: 25px;
             margin-bottom: 30px;
             padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: none;
         }
 
         .theme-toggle {
@@ -162,6 +215,8 @@
         .dropdown-menu {
             position: absolute; top: 110%; right: 0; width: 180px;
             background: var(--white); border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             display: none; flex-direction: column; overflow: hidden; z-index: 1000;
             transition: background-color 0.3s, border-color 0.3s;
@@ -176,8 +231,8 @@
 
         .stat-card, .content-block {
             background: var(--glass-bg) !important;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border: 1px solid var(--glass-border) !important;
             border-radius: 20px;
             transition: background-color 0.3s, border-color 0.3s;
@@ -202,6 +257,7 @@
         
         .search-box {
             background-color: var(--white); border-radius: 16px; border: 2px solid var(--border-color);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             display: flex; align-items: center; padding: 0 20px; height: 50px; color: var(--sber-green);
             width: 100%; box-sizing: border-box; transition: var(--transition);
         }
@@ -238,6 +294,8 @@
             color: var(--text-muted);
             border: 1px solid var(--border-color);
             background: var(--white);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             width: 24px;
             height: 24px;
             display: inline-flex;
@@ -287,6 +345,8 @@
             border-radius: 16px;
             border: 2px solid var(--border-color);
             background: var(--white);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: var(--text-main);
             font-size: 14px;
             font-weight: 600;
@@ -377,6 +437,8 @@
 
         .select-compact, .input-compact {
             background: var(--white);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: var(--text-main);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -425,6 +487,7 @@
         }
         .modal-content {
             background: var(--white); padding: 30px; border-radius: 24px;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             width: 800px; max-width: 90%; position: relative;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             animation: fadeInUp 0.3s ease;
@@ -504,12 +567,50 @@
             .modal-avatar-wrapper { height: 250px; }
             .modal-content { width: 95%; max-height: 90vh; overflow-y: auto; padding: 20px; }
         }
+
+        /* Анимация частиц на фоне */
+        .particles-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--sber-green);
+            opacity: 0;
+            animation: animateParticle linear infinite;
+        }
+
+        @keyframes animateParticle {
+            0% {
+                transform: translate(0, 0);
+                opacity: 0;
+            }
+            10% {
+                opacity: var(--p-opacity);
+            }
+            90% {
+                opacity: var(--p-opacity);
+            }
+            100% {
+                transform: translate(var(--p-tx), var(--p-ty));
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="mesh-gradient"></div>
+    <div class="particles-container" id="particlesContainer"></div>
 
-    <aside>
+    <aside id="sidebar">
+        <div class="sidebar-toggle-btn" id="sidebarToggle">
+            <i class="fa-solid fa-chevron-left"></i>
+        </div>
         <div class="sidebar-top">
             <div class="logo-container">
                 <svg width="32" height="32" viewBox="0 0 100 100">
@@ -519,11 +620,11 @@
                 <div class="logo-text">STARLIFT</div>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Главная</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-user-group"></i> Спикеры</a>
-                <a href="#" class="nav-item"><i class="fa-regular fa-calendar-days"></i> Мероприятия</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-chart-simple"></i> Аналитика</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> Настройки</a>
+                <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> <span>Главная</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-user-group"></i> <span>Спикеры</span></a>
+                <a href="#" class="nav-item"><i class="fa-regular fa-calendar-days"></i> <span>Мероприятия</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-chart-simple"></i> <span>Аналитика</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> <span>Настройки</span></a>
             </nav>
         </div>
         <div class="sidebar-bottom-logo animate-fade" style="animation-delay: 0.5s;">
@@ -562,11 +663,11 @@
         <div class="stats-grid">
             <div class="stat-card animate-fade" style="animation-delay: 0.1s;">
                 <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
-                <div class="stat-info"><span class="stat-label">Всего Спикеров</span><div style="font-size: 24px; font-weight: 700;">248</div></div>
+                <div class="stat-info"><span class="stat-label">Всего Спикеров</span><div id="totalSpeakersCounter" style="font-size: 24px; font-weight: 700;">0</div></div>
             </div>
             <div class="stat-card animate-fade" style="animation-delay: 0.2s;">
                 <div class="stat-icon"><i class="fa-solid fa-microphone"></i></div>
-                <div class="stat-info"><span class="stat-label">Мероприятий</span><div style="font-size: 24px; font-weight: 700;">1,042</div></div>
+                <div class="stat-info"><span class="stat-label">Мероприятий</span><div id="totalEventsCounter" style="font-size: 24px; font-weight: 700;">0</div></div>
             </div>
         </div>
 
@@ -708,9 +809,18 @@
         </div>
     </div>
 
+    <!-- Подключаем внешнюю базу данных (массив speakersData) -->
+    <script src="speakers.js"></script>
     <script>
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('i');
+        
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
         
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
@@ -732,18 +842,8 @@
 
         const trigger = document.getElementById('profileTrigger');
         const menu = document.getElementById('dropdownMenu');
-        const speakersData = [
-            { id: 1, name: "Иван Иванов", sub: "DS, Новосибирск", stack: "Python, NLP, ML", city: "Новосибирск", status: "Активен", nps: 9.6, img: "11", events: [{t: "SberConf 2025", s: "past"}, {t: "AI Journey", s: "future"}] },
-            { id: 2, name: "Александр Волков", sub: "Java, СПб", stack: "Spring, Kafka", city: "Санкт-Петербург", status: "Активен", nps: 9.4, img: "12", events: [{t: "Java Day", s: "past"}] },
-            { id: 3, name: "Мария Смирнова", sub: "Design, Москва", stack: "Figma, UI/UX", city: "Москва", status: "Активен", nps: 9.8, img: "25", events: [{t: "Design Weekend", s: "future"}] },
-            { id: 4, name: "Дмитрий Козлов", sub: "DevOps, Екб", stack: "Docker, K8s", city: "Екатеринбург", status: "Неактивен", nps: 9.2, img: "32", events: [{t: "DevOps Conf", s: "past"}] },
-            { id: 5, name: "Елена Соколова", sub: "Python, Новосибирск", stack: "Django, FastAPI", city: "Новосибирск", status: "Активен", nps: 9.5, img: "44", events: [{t: "Python Meetup", s: "past"}] },
-            { id: 6, name: "Артем Морозов", sub: "Mobile, Самара", stack: "Kotlin, Swift", city: "Самара", status: "Активен", nps: 9.1, img: "51", events: [{t: "Mobile World", s: "future"}] },
-            { id: 7, name: "Олег Волков", sub: "JS, Казань", stack: "React, Node.js", city: "Казань", status: "Активен", nps: 9.7, img: "18", events: [{t: "React Conf", s: "past"}] },
-            { id: 8, name: "Сергей Попов", sub: "Data, Москва", stack: "SQL, ETL", city: "Москва", status: "Неактивен", nps: 8.9, img: "60", events: [{t: "Data Fest", s: "past"}] },
-            { id: 9, name: "Ольга Новикова", sub: "QA, СПб", stack: "Selenium, Pytest", city: "Санкт-Петербург", status: "Активен", nps: 9.3, img: "49", events: [{t: "QA Fest", s: "future"}] },
-            { id: 10, name: "Виктор Лебедев", sub: "C++, Екб", stack: "Embedded, Qt", city: "Екатеринбург", status: "Активен", nps: 9.0, img: "22", events: [{t: "C++ Russia", s: "past"}] }
-        ];
+        
+        // Массив speakersData берется из подключаемого файла speakers.js
 
         const sortState = {
             col: null,
@@ -942,6 +1042,18 @@
 
         function render(data) {
             const body = document.getElementById('tableBody');
+            
+            // Обновляем статистику на основе отображаемых данных
+            const totalSpeakers = data.length;
+            let totalEvents = 0;
+            data.forEach(s => {
+                if (s.events) {
+                    totalEvents += s.events.length;
+                }
+            });
+            document.getElementById('totalSpeakersCounter').textContent = totalSpeakers;
+            document.getElementById('totalEventsCounter').textContent = totalEvents;
+
             body.innerHTML = data.map((s, i) => `
                 <tr class="${i % 2 !== 0 ? 'alt-row' : ''}" onclick="showEvents(${s.id})">
                     <td>
@@ -1027,6 +1139,46 @@
                 }
             });
         });
+
+        // Генерация частиц для фона
+        const particlesContainer = document.getElementById('particlesContainer');
+        const particleCount = 250; // Количество частиц
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Случайные размеры: от 2px до 8px
+            const size = Math.random() * 6 + 2; 
+            // Случайная начальная позиция: случайные координаты по всей странице
+            const startX = Math.random() * 100;
+            const startY = Math.random() * 100;
+            
+            // Векторы движения: от -100px до 100px
+            const tx = (Math.random() - 0.5) * 200; 
+            const ty = (Math.random() - 0.5) * 200;
+            
+            // Продолжительность анимации и задержка
+            const duration = Math.random() * 15 + 10; // 10s до 25s
+            const delay = Math.random() * 5;
+            
+            // Прозрачность
+            const opacity = Math.random() * 0.3 + 0.05; // 0.05 до 0.35
+            
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${startX}vw`;
+            particle.style.top = `${startY}vh`;
+            
+            particle.style.setProperty('--p-tx', `${tx}px`);
+            particle.style.setProperty('--p-ty', `${ty}px`);
+            particle.style.setProperty('--p-opacity', opacity);
+            
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.animationDelay = `${delay}s`;
+            
+            particlesContainer.appendChild(particle);
+        }
 
         applyFiltersAndRender();
     </script>
