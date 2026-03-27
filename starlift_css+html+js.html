@@ -25,6 +25,7 @@
             --mesh-1: #daffe5;
             --mesh-2: #d8f8e7;
             --glass-bg: rgba(255, 255, 255, 0.4);
+            --panel-bg: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(224, 224, 224, 0.4);
             --status-past-bg: rgba(241, 243, 244, 0.8);
             --status-past-color: #5F6368;
@@ -51,6 +52,7 @@
             --mesh-1: #0B1812;
             --mesh-2: #07120E;
             --glass-bg: rgba(30, 30, 30, 0.4);
+            --panel-bg: rgba(20, 25, 22, 0.90);
             --glass-border: rgba(80, 80, 80, 0.4);
             --status-past-bg: rgba(44, 48, 51, 0.8);
             --status-past-color: #A0A5AA;
@@ -75,6 +77,34 @@
             z-index: -1;
             background: linear-gradient(135deg, var(--mesh-1), var(--mesh-2));
             transition: background 0.3s;
+        }
+
+        .top-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            background: radial-gradient(ellipse at top, rgba(10, 128, 59, 0.15) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+            transition: background 0.3s;
+        }
+
+        .top-glow::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.25;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+        }
+
+        [data-theme="dark"] .top-glow {
+            background: radial-gradient(ellipse at top, rgba(33, 160, 56, 0.25) 0%, transparent 70%);
         }
 
         @keyframes gradientAnimation {
@@ -196,14 +226,26 @@
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: none;
+            position: sticky;
+            top: -30px; /* Компенсируем padding-top у main (30px) */
+            padding-top: 30px; /* Добавляем отступ сверху для красоты */
+            z-index: 100;
         }
 
         .theme-toggle {
-            background: none; border: none; font-size: 20px; 
-            color: var(--text-main); cursor: pointer; padding: 5px;
-            transition: color 0.3s, transform 0.3s;
+            background-color: var(--light-green); border: none; font-size: 20px; 
+            color: var(--sber-green); cursor: pointer; 
+            width: 42px; height: 42px; border-radius: 50px;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
         }
-        .theme-toggle:hover { color: var(--sber-green); transform: scale(1.1); }
+        .theme-toggle i {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        [data-theme="dark"] .theme-toggle i {
+            transform: rotate(45deg);
+        }
+        .theme-toggle:hover { transform: scale(1.02); filter: brightness(0.95); }
 
         .admin-profile-container { position: relative; }
         .admin-profile { 
@@ -222,10 +264,13 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: none; flex-direction: column; overflow: hidden; z-index: 1000;
-            transition: background-color 0.3s, border-color 0.3s;
+            display: flex; flex-direction: column; overflow: hidden; z-index: 1000;
+            opacity: 0; visibility: hidden; transform: translateY(-10px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s, border-color 0.3s;
         }
-        .dropdown-menu.show { display: flex; }
+        .dropdown-menu.show { 
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
         .dropdown-item {
             padding: 12px 15px; font-size: 14px; color: var(--text-main);
             text-decoration: none; display: flex; align-items: center; gap: 10px;
@@ -381,19 +426,24 @@
             right: 0;
             width: 380px;
             max-width: calc(100vw - 40px);
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: var(--panel-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             box-shadow: 0 16px 35px rgba(0,0,0,0.12);
             padding: 16px;
-            display: none;
             z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .filters-panel.show {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
         .filters-panel-title {
@@ -610,6 +660,7 @@
 </head>
 <body>
     <div class="mesh-gradient"></div>
+    <div class="top-glow"></div>
     <div class="particles-container" id="particlesContainer"></div>
 
     <aside id="sidebar">
