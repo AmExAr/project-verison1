@@ -1,113 +1,49 @@
-# StarLift
+﻿# Проект Starlift (project-version1)
 
-> Платформа учёта и оценки корпоративных спикеров.
-
-## Быстрый старт
-
-### Предварительные требования
-
-- Docker + Docker Compose
-- (опционально) Python 3.12, Node.js 20
-
-### Запуск через Docker
-
-```bash
-# Скопировать переменные окружения
-cp .env.example .env
-
-# Поднять все сервисы
-docker compose up --build
-```
-
-Сервисы:
-
-| Сервис   | URL                        |
-|----------|----------------------------|
-| API      | http://localhost:8000       |
-| API Docs | http://localhost:8000/docs  |
-| DB       | localhost:5432              |
-| Redis    | localhost:6379              |
-
-### Миграции БД
-
-```bash
-cd backend
-alembic upgrade head
-```
-
-### Создание первого пользователя
-
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email": "admin@company.com", "password": "admin123", "full_name": "Admin", "role": "admin"}'
-```
-
-### Загрузка CSV
-
-Формат файла:
-
-```
-speaker_name,topic,talk_date,event_title,event_type,city,nps,recording_url,event_url
-Иванов Иван,Микросервисы на Go,2026-01-15,GoConf 2026,external,Москва,85,,https://goconf.ru
-```
-
-## Архитектура
-
-Подробная документация: [docs/architecture.md](docs/architecture.md)
+Это веб-приложение на базе Django.
 
 ## Структура проекта
+- starlift/ - основная папка с кодом Django приложения (настройки, маршруты, представления).
+- docs/ - документация к проекту, включая архитектуру.
+- requirements.txt - зависимости проекта.
 
-```
-StarLift/
-├── backend/          # FastAPI + SQLAlchemy
-│   ├── app/
-│   │   ├── api/      # HTTP роутеры
-│   │   ├── core/     # конфиг, auth, deps
-│   │   ├── models/   # ORM модели
-│   │   ├── schemas/  # Pydantic-схемы
-│   │   ├── services/ # бизнес-логика
-│   │   └── parsers/  # парсеры внешних площадок
-│   └── alembic/      # миграции БД
-├── bot/              # Telegram-бот (aiogram 3)
-├── docs/             # архитектурная документация
-└── docker-compose.yml
-```
+## Требования
+- Python 3.10+ (или совместимая версия)
+- Виртуальное окружение (рекомендуется)
+- PostgreSQL (требуется psycopg2-binary)
 
-## API Endpoints
+## Установка и запуск
 
-```
-POST   /api/v1/auth/register
-POST   /api/v1/auth/login
-POST   /api/v1/auth/refresh
-GET    /api/v1/auth/me
+1. **Клонируйте репозиторий и перейдите в папку проекта:**
+   `
+   git clone <url-вашего-репозитория>
+   cd project-version1
+   `
 
-GET    /api/v1/speakers
-POST   /api/v1/speakers
-GET    /api/v1/speakers/{id}
-PATCH  /api/v1/speakers/{id}
+2. **Создайте и активируйте виртуальное окружение:**
+   `
+   python -m venv .venv
+   
+   # Для Windows:
+   .venv\Scripts\activate
+   # Для macOS/Linux:
+   source .venv/bin/activate
+   `
 
-GET    /api/v1/events
-POST   /api/v1/events
-PATCH  /api/v1/events/{id}
+3. **Установите зависимости:**
+   `
+   pip install -r requirements.txt
+   `
 
-GET    /api/v1/talks
-POST   /api/v1/talks
-PATCH  /api/v1/talks/{id}
-PATCH  /api/v1/talks/{id}/review
+4. **Выполните миграции базы данных:**
+   По умолчанию используется база данных из PostgreSQL. Выполните:
+   `ash
+   cd starlift
+   python manage.py migrate
+   `
 
-POST   /api/v1/import/upload
-
-GET    /api/v1/scores
-GET    /api/v1/scores/{speaker_id}
-POST   /api/v1/scores/recalculate
-
-GET    /api/v1/candidates/lists
-POST   /api/v1/candidates/lists
-GET    /api/v1/candidates/lists/{id}
-POST   /api/v1/candidates/generate
-
-GET    /api/v1/analytics/overview
-
-POST   /api/v1/bot/talks          # internal — from TG bot
-```
+5. **Запустите локальный сервер разработки:**
+   `
+   python manage.py runserver
+   `
+   Сервер будет доступен по адресу http://127.0.0.1:8000/.
