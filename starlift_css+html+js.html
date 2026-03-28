@@ -1,11 +1,9 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STARLIFT</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='50,5 61,35 95,35 68,55 78,85 50,65 22,85 32,55 5,35 39,35' fill='%230A803B'/%3E%3Cpath d='M20,80 L55,45 L65,55 L90,20' fill='none' stroke='white' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -867,23 +865,8 @@
         </div>
     </div>
 
-    <!-- Скрипт теперь находится прямо здесь -->
-    <script>
-        let speakersData = [];
-
-        async function loadSpeakersData() {
-            try {
-                const response = await fetch('/api/speakers/');
-                speakersData = await response.json();
-                populateFilters();
-                applyFiltersAndRender();
-            } catch (error) {
-                console.error('Ошибка при загрузке данных спикеров:', error);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', loadSpeakersData);
-    </script>
+    <!-- Подключаем внешнюю базу данных (массив speakersData) -->
+    <script src="speakers.js"></script>
     <script>
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('i');
@@ -957,6 +940,7 @@
                 stackFilter.appendChild(opt);
             });
         }
+        populateFilters();
 
         function normalizeText(v) {
             return (v ?? '').toString().toLowerCase().trim();
@@ -1252,6 +1236,7 @@
             particlesContainer.appendChild(particle);
         }
 
+        applyFiltersAndRender();
     </script>
 </body>
 </html>
