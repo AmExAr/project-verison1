@@ -1,0 +1,540 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .events-page {
+        display: grid;
+        gap: 20px;
+    }
+
+    .events-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .events-title {
+        margin: 0;
+        font-size: clamp(28px, 3vw, 40px);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--text-main);
+    }
+
+    .events-subtitle {
+        margin: 8px 0 0;
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .event-card-large {
+        position: relative;
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        background: var(--glass-bg);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .event-card-large:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .event-card-large:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 30px rgba(10,128,59,0.08);
+        border-color: rgba(10,128,59,0.2);
+    }
+
+    .event-card-large::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(10,128,59,0.12), transparent 45%);
+        opacity: 0;
+        transition: var(--transition);
+        pointer-events: none;
+    }
+
+    .event-card-large:hover::after {
+        opacity: 1;
+    }
+
+    .event-card-large > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .event-card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .event-date-box {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .event-date-main {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .event-date-sub {
+        color: var(--text-muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+    }
+
+    .event-title-card {
+        margin: 0 0 10px;
+        font-size: 20px;
+        line-height: 1.35;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .event-description-card {
+        margin: 0 0 18px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .stacked-avatars {
+        display: flex;
+        align-items: center;
+    }
+
+    .stacked-avatars .avatar {
+        width: 40px;
+        height: 40px;
+        margin-left: -10px;
+        border: 2px solid var(--panel-bg);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    }
+
+    .stacked-avatars .avatar:first-child {
+        margin-left: 0;
+    }
+
+    .event-card-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .speaker-count {
+        font-size: 13px;
+        color: var(--text-main);
+        font-weight: 600;
+    }
+
+    .event-modal-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+        gap: 20px;
+        margin-top: 8px;
+    }
+
+    .event-modal-section {
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--border-color);
+        background: var(--panel-bg);
+        transition: var(--transition);
+    }
+
+    .event-modal-section:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .event-modal-title {
+        margin: 0 0 12px;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .schedule-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .schedule-item {
+        display: grid;
+        grid-template-columns: 74px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 12px;
+        border-radius: 14px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+    
+    .schedule-item:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .schedule-time {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--sber-green);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .schedule-text {
+        font-size: 14px;
+        color: var(--text-main);
+        line-height: 1.5;
+    }
+
+    .speaker-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+
+    .speaker-chip:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .speaker-chip .avatar {
+        width: 34px;
+        height: 34px;
+    }
+
+    .speaker-chip strong {
+        display: block;
+        font-size: 14px;
+        color: var(--text-main);
+    }
+
+    .speaker-chip span {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    @media (max-width: 960px) {
+        .events-grid,
+        .event-modal-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="events-page">
+    <div class="events-header animate-fade">
+        <div>
+            <h1 class="events-title">Мероприятия</h1>
+            <p class="events-subtitle">Карточки ближайших и прошедших событий с подробным просмотром</p>
+        </div>
+        <span class="badge-active"><i class="fa-solid fa-calendar-days"></i> 4 активных карточки</span>
+    </div>
+
+    <div class="events-grid animate-fade" style="animation-delay: 0.08s;">
+        <article class="event-card-large" data-event-key="python">
+            <div class="event-card-top">
+                <div class="event-date-box">
+                    <span class="event-date-main">12 мая, 10:00</span>
+                    <span class="event-date-sub">Москва · Офлайн</span>
+                </div>
+                <span class="badge-active">Планируется</span>
+            </div>
+            <h2 class="event-title-card">SberTech Meetup: Python Edition</h2>
+            <p class="event-description-card">Практический митап про Python, Django, автоматизацию и внутренние инструменты команды.</p>
+            <div class="event-card-bottom">
+                <div class="stacked-avatars">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=12" alt="Алексей Иванов">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=32" alt="Елена Смирнова">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=45" alt="Мария Ковалева">
+                </div>
+                <div class="speaker-count"><i class="fa-solid fa-users"></i> 3 спикера</div>
+            </div>
+        </article>
+
+        <article class="event-card-large" data-event-key="frontend">
+            <div class="event-card-top">
+                <div class="event-date-box">
+                    <span class="event-date-main">15 мая, 17:30</span>
+                    <span class="event-date-sub">Онлайн трансляция</span>
+                </div>
+                <span class="badge-active">Планируется</span>
+            </div>
+            <h2 class="event-title-card">Frontend Masters: React 19</h2>
+            <p class="event-description-card">Обновленный React, server components, дизайн-система и качество frontend-кода.</p>
+            <div class="event-card-bottom">
+                <div class="stacked-avatars">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=22" alt="Елена Смирнова">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=41" alt="Ирина Соколова">
+                </div>
+                <div class="speaker-count"><i class="fa-solid fa-users"></i> 2 спикера</div>
+            </div>
+        </article>
+
+        <article class="event-card-large" data-event-key="ai">
+            <div class="event-card-top">
+                <div class="event-date-box">
+                    <span class="event-date-main">20 мая, 12:00</span>
+                    <span class="event-date-sub">Гибридный формат</span>
+                </div>
+                <span class="badge-active">Планируется</span>
+            </div>
+            <h2 class="event-title-card">AI Journey 2026</h2>
+            <p class="event-description-card">Инновации в ML, генеративные модели, MLOps и практические кейсы внедрения AI.</p>
+            <div class="event-card-bottom">
+                <div class="stacked-avatars">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=14" alt="Дмитрий Петров">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=64" alt="Наталья Орлова">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=15" alt="Анна Каренина">
+                </div>
+                <div class="speaker-count"><i class="fa-solid fa-users"></i> 3 спикера</div>
+            </div>
+        </article>
+
+        <article class="event-card-large" data-event-key="devops">
+            <div class="event-card-top">
+                <div class="event-date-box">
+                    <span class="event-date-main">28 мая, 14:00</span>
+                    <span class="event-date-sub">Санкт-Петербург · Офлайн</span>
+                </div>
+                <span class="badge-inactive">Завершено</span>
+            </div>
+            <h2 class="event-title-card">DevOps Day: Platform Engineering</h2>
+            <p class="event-description-card">Платформенная инженерия, CI/CD, observability и надежные релизные процессы.</p>
+            <div class="event-card-bottom">
+                <div class="stacked-avatars">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=24" alt="Андрей Волков">
+                    <img class="avatar" src="https://i.pravatar.cc/150?img=58" alt="Сергей Лебедев">
+                </div>
+                <div class="speaker-count"><i class="fa-solid fa-users"></i> 2 спикера</div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<script>
+    const eventsData = {
+        python: {
+            title: 'SberTech Meetup: Python Edition',
+            status: 'Планируется',
+            badgeClass: 'badge-active',
+            description: 'Практический митап про Python, Django, автоматизацию и внутренние инструменты команды.',
+            location: 'Москва · Офлайн',
+            count: 'Ожидается 150+ участников',
+            format: 'Офлайн площадка, 2 трека, welcome coffee и нетворкинг.',
+            coverAvatar: 'https://i.pravatar.cc/150?img=12',
+            speakers: [
+                { name: 'Алексей Иванов', stack: 'Python, Django', avatar: 'https://i.pravatar.cc/150?img=12' },
+                { name: 'Елена Смирнова', stack: 'Backend, APIs', avatar: 'https://i.pravatar.cc/150?img=32' },
+                { name: 'Мария Ковалева', stack: 'Data, ETL', avatar: 'https://i.pravatar.cc/150?img=45' }
+            ],
+            schedule: [
+                { time: '10:00', text: 'Регистрация и welcome coffee' },
+                { time: '10:30', text: 'Открытие и вводный доклад' },
+                { time: '11:00', text: 'Практика по Django и API' },
+                { time: '12:00', text: 'Q&A и нетворкинг' }
+            ]
+        },
+        frontend: {
+            title: 'Frontend Masters: React 19',
+            status: 'Планируется',
+            badgeClass: 'badge-active',
+            description: 'Обновленный React, server components, дизайн-система и качество frontend-кода.',
+            location: 'Онлайн трансляция',
+            count: 'Ожидается 80+ участников',
+            format: 'Онлайн формат с Q&A в конце каждого блока.',
+            coverAvatar: 'https://i.pravatar.cc/150?img=22',
+            speakers: [
+                { name: 'Елена Смирнова', stack: 'Frontend, React', avatar: 'https://i.pravatar.cc/150?img=22' },
+                { name: 'Ирина Соколова', stack: 'Design System', avatar: 'https://i.pravatar.cc/150?img=41' }
+            ],
+            schedule: [
+                { time: '17:30', text: 'Открытие и вводная часть' },
+                { time: '17:45', text: 'React 19: ключевые изменения' },
+                { time: '18:20', text: 'UI performance и UX-паттерны' },
+                { time: '19:00', text: 'Вопросы и ответы' }
+            ]
+        },
+        ai: {
+            title: 'AI Journey 2026',
+            status: 'Планируется',
+            badgeClass: 'badge-active',
+            description: 'Инновации в ML, генеративные модели, MLOps и практические кейсы внедрения AI.',
+            location: 'Гибридный формат',
+            count: 'Ожидается 300+ участников',
+            format: 'Офлайн сцена + онлайн-трансляция, 3 секции выступлений.',
+            coverAvatar: 'https://i.pravatar.cc/150?img=14',
+            speakers: [
+                { name: 'Дмитрий Петров', stack: 'ML Platform', avatar: 'https://i.pravatar.cc/150?img=14' },
+                { name: 'Наталья Орлова', stack: 'GenAI', avatar: 'https://i.pravatar.cc/150?img=64' },
+                { name: 'Анна Каренина', stack: 'Data Science', avatar: 'https://i.pravatar.cc/150?img=15' }
+            ],
+            schedule: [
+                { time: '12:00', text: 'Сбор гостей и welcome track' },
+                { time: '12:30', text: 'AI-стек в продуктовых командах' },
+                { time: '13:20', text: 'Кейсы генеративных моделей' },
+                { time: '14:10', text: 'Панельная дискуссия' }
+            ]
+        },
+        devops: {
+            title: 'DevOps Day: Platform Engineering',
+            status: 'Завершено',
+            badgeClass: 'badge-inactive',
+            description: 'Платформенная инженерия, CI/CD, observability и надежные релизные процессы.',
+            location: 'Санкт-Петербург · Офлайн',
+            count: '120 участников, 18 спикеров в пуле',
+            format: 'Прошедшее мероприятие, материалы и записи доступны команде.',
+            coverAvatar: 'https://i.pravatar.cc/150?img=24',
+            speakers: [
+                { name: 'Андрей Волков', stack: 'Kubernetes, CI/CD', avatar: 'https://i.pravatar.cc/150?img=24' },
+                { name: 'Сергей Лебедев', stack: 'Platform Engineering', avatar: 'https://i.pravatar.cc/150?img=58' }
+            ],
+            schedule: [
+                { time: '14:00', text: 'Открытие и приветствие' },
+                { time: '14:20', text: 'Observability в больших системах' },
+                { time: '15:00', text: 'Платформенный подход к CI/CD' },
+                { time: '16:00', text: 'Закрытие и итоги' }
+            ]
+        }
+    };
+
+    function renderEventModal(eventKey) {
+        const event = eventsData[eventKey];
+        if (!event) return;
+
+        document.getElementById('eventStatusBadge').className = event.badgeClass;
+        document.getElementById('eventStatusBadge').textContent = event.status;
+        document.getElementById('eventModalTitle').textContent = event.title;
+        document.getElementById('eventModalDescription').textContent = event.description;
+        document.getElementById('eventCoverAvatar').src = event.coverAvatar;
+        document.getElementById('eventLocationLine').textContent = event.location;
+        document.getElementById('eventCountLine').textContent = event.count;
+        document.getElementById('eventFormatLine').textContent = event.format;
+
+        document.getElementById('eventSpeakersList').innerHTML = event.speakers.map(speaker => `
+            <div class="speaker-chip">
+                <img class="avatar" src="${speaker.avatar}" alt="${speaker.name}">
+                <div>
+                    <strong>${speaker.name}</strong>
+                    <span>${speaker.stack}</span>
+                </div>
+            </div>
+        `).join('');
+
+        document.getElementById('eventScheduleList').innerHTML = event.schedule.map(item => `
+            <div class="schedule-item">
+                <div class="schedule-time">${item.time}</div>
+                <div class="schedule-text">${item.text}</div>
+            </div>
+        `).join('');
+    }
+
+    function openEventModal(eventKey) {
+        renderEventModal(eventKey);
+        document.getElementById('eventModalOverlay').style.display = 'flex';
+    }
+
+    function initEventsPage() {
+        document.querySelectorAll('.event-card-large').forEach(card => {
+            card.replaceWith(card.cloneNode(true));
+        });
+        
+        document.querySelectorAll('.event-card-large').forEach(card => {
+            card.addEventListener('click', () => openEventModal(card.dataset.eventKey));
+        });
+
+        if (!window.__eventsPageInitialized) {
+            window.__eventsPageInitialized = true;
+            // Обработчик закрытия по кликам "мимо" и на крестик, а также Escape теперь реализован глобально в base.html
+        }
+    }
+
+    initEventsPage();
+    document.addEventListener('spa-page-loaded', () => {
+        if (document.getElementById('eventModalOverlay')) {
+            initEventsPage();
+        }
+    });
+</script>
+{% endblock %}
+
+{% block modals %}
+    <div class="modal-overlay" id="eventModalOverlay">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark modal-close" id="eventModalClose"></i>
+            <div class="event-modal-grid">
+                <div class="event-modal-section">
+                    <div class="badge-active" id="eventStatusBadge" style="display:inline-flex; margin-bottom:12px;"></div>
+                    <h2 class="event-modal-title" id="eventModalTitle"></h2>
+                    <p class="events-subtitle" id="eventModalDescription"></p>
+
+                    <div style="display:grid; gap:12px; margin-top:18px;">
+                        <div class="speaker-chip">
+                            <img class="avatar" id="eventCoverAvatar" src="" alt="Cover avatar">
+                            <div>
+                                <strong id="eventLocationLine"></strong>
+                                <span id="eventCountLine"></span>
+                            </div>
+                        </div>
+                        <div class="speaker-chip">
+                            <div class="avatar" style="background: var(--sber-green); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800;">24</div>
+                            <div>
+                                <strong>Формат и логистика</strong>
+                                <span id="eventFormatLine"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-modal-section">
+                    <h3 class="section-title" style="margin-bottom: 14px; font-size: 18px;"><i class="fa-solid fa-microphone-lines"></i> Утвержденные спикеры</h3>
+                    <div id="eventSpeakersList" style="display:grid; gap:10px;"></div>
+
+                    <h3 class="section-title" style="margin: 18px 0 14px; font-size: 18px;"><i class="fa-solid fa-clock"></i> Расписание</h3>
+                    <div class="schedule-list" id="eventScheduleList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

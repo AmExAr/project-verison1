@@ -1,9 +1,22 @@
-from django.shortcuts import render
+﻿from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Speaker
 
-def index(request):
+
+def index_view(request):
     return render(request, 'index.html')
+
+def speakers_view(request):
+    return render(request, 'speakers.html')
+
+def events_view(request):
+    return render(request, 'events.html')
+
+def analytics_view(request):
+    return render(request, 'analytics.html')
+
+def profile_view(request):
+    return render(request, 'profile.html')
 
 def speakers_api(request):
     speakers = Speaker.objects.prefetch_related('events').all()

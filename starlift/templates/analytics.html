@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .analytics-page {
+        display: grid;
+        gap: 20px;
+    }
+
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .analytics-title {
+        margin: 0;
+        font-size: clamp(28px, 3vw, 40px);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--text-main);
+    }
+
+    .analytics-subtitle {
+        margin: 8px 0 0;
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+    .analytics-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .analytics-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .metric-card {
+        padding: 20px;
+        display: grid;
+        gap: 10px;
+        min-height: 126px;
+    }
+
+    .metric-label {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .metric-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.04em;
+    }
+
+    .metric-delta {
+        font-size: 12px;
+        color: var(--sber-green);
+        font-weight: 700;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .chart-block {
+        min-height: 360px;
+        display: grid;
+        gap: 16px;
+    }
+
+    .chart-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chart-placeholder {
+        min-height: 280px;
+        border-radius: 18px;
+        border: 1px dashed var(--border-color);
+        background: var(--glass-bg);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        transition: var(--transition);
+    }
+
+    .chart-placeholder:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .chart-placeholder::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(10,128,59,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(10,128,59,0.04) 1px, transparent 1px);
+        background-size: 28px 28px;
+        opacity: 0.45;
+        pointer-events: none;
+    }
+
+    .chart-placeholder-inner {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: var(--text-muted);
+        max-width: 340px;
+    }
+
+    .chart-placeholder-inner i {
+        font-size: 30px;
+        color: var(--sber-green);
+        margin-bottom: 10px;
+    }
+
+    .funnel {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .funnel-step {
+        position: relative;
+        height: 54px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 12px 20px rgba(10,128,59,0.08);
+    }
+
+    .funnel-step span:last-child {
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .funnel-1 { width: 100%; background: linear-gradient(135deg, rgba(10,128,59,0.92), rgba(10,128,59,0.72)); }
+    .funnel-2 { width: 82%; background: linear-gradient(135deg, rgba(10,128,59,0.80), rgba(10,128,59,0.62)); }
+    .funnel-3 { width: 64%; background: linear-gradient(135deg, rgba(10,128,59,0.68), rgba(10,128,59,0.50)); }
+    .funnel-4 { width: 46%; background: linear-gradient(135deg, rgba(10,128,59,0.56), rgba(10,128,59,0.40)); }
+
+    .mini-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .mini-table td {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 14px;
+    }
+
+    .city-pill {
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--light-green);
+        border: 1px solid var(--border-color);
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    @media (max-width: 1100px) {
+        .analytics-kpis,
+        .analytics-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 700px) {
+        .analytics-kpis,
+        .analytics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="analytics-page">
+    <div class="analytics-header animate-fade">
+        <div>
+            <h1 class="analytics-title">Аналитика</h1>
+            <p class="analytics-subtitle">Наглядные показатели по базе, активности и качеству выступлений</p>
+        </div>
+        <div class="analytics-actions">
+            <button class="btn-action btn-contact" type="button" id="exportExcelBtn"><i class="fa-solid fa-file-excel"></i> Экспорт в Excel</button>
+            <button class="btn-action btn-contact" type="button" id="exportPdfBtn"><i class="fa-solid fa-file-pdf"></i> Экспорт в PDF</button>
+        </div>
+    </div>
+
+    <div class="analytics-kpis animate-fade" style="animation-delay: 0.08s;">
+        <div class="stat-card metric-card">
+            <div class="metric-label">Новые спикеры за месяц</div>
+            <div class="metric-value">18</div>
+            <div class="metric-delta">+12% к прошлому периоду</div>
+        </div>
+        <div class="stat-card metric-card">
+            <div class="metric-label">Средний NPS</div>
+            <div class="metric-value">9.4</div>
+            <div class="metric-delta">Цель выполнена</div>
+        </div>
+        <div class="stat-card metric-card">
+            <div class="metric-label">Активные города</div>
+            <div class="metric-value">14</div>
+            <div class="metric-delta">Стабильный рост покрытия</div>
+        </div>
+        <div class="stat-card metric-card">
+            <div class="metric-label">Проведено мероприятий</div>
+            <div class="metric-value">18</div>
+            <div class="metric-delta">6 запланировано далее</div>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+        <div class="content-block chart-block animate-fade" style="animation-delay: 0.12s;">
+            <h2 class="chart-title"><i class="fa-solid fa-chart-line"></i> Динамика роста базы спикеров</h2>
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-inner">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <div>Контейнер под линейный график</div>
+                    <div style="margin-top: 6px; font-size: 13px;">Подключите Chart.js или ApexCharts к блоку с id <b>speakerGrowthChart</b></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-block chart-block animate-fade" style="animation-delay: 0.16s;">
+            <h2 class="chart-title"><i class="fa-solid fa-chart-pie"></i> Распределение стека технологий</h2>
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-inner">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <div>Контейнер под Pie Chart</div>
+                    <div style="margin-top: 6px; font-size: 13px;">Используйте блок с id <b>stackDistributionChart</b></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-block chart-block animate-fade" style="animation-delay: 0.20s;">
+            <h2 class="chart-title"><i class="fa-solid fa-filter"></i> Воронка: от инвайта до выступления</h2>
+            <div class="chart-placeholder">
+                <div class="funnel" id="inviteFunnel">
+                    <div class="funnel-step funnel-1"><span>Инвайтов отправлено</span><span>420</span></div>
+                    <div class="funnel-step funnel-2"><span>Ответили</span><span>168</span></div>
+                    <div class="funnel-step funnel-3"><span>Подтвердили участие</span><span>92</span></div>
+                    <div class="funnel-step funnel-4"><span>Выступили</span><span>54</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-block chart-block animate-fade" style="animation-delay: 0.24s;">
+            <h2 class="chart-title"><i class="fa-solid fa-location-dot"></i> Корреляция Город - NPS</h2>
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-inner" style="width:100%; max-width:none;">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>Контейнер под scatter / heatmap / bubble chart</div>
+                    <table class="mini-table" style="margin-top: 18px;">
+                        <tbody>
+                            <tr><td>Москва</td><td style="text-align:right;"><span class="city-pill">9.7</span></td></tr>
+                            <tr><td>Санкт-Петербург</td><td style="text-align:right;"><span class="city-pill">9.5</span></td></tr>
+                            <tr><td>Казань</td><td style="text-align:right;"><span class="city-pill">9.3</span></td></tr>
+                            <tr><td>Новосибирск</td><td style="text-align:right;"><span class="city-pill">9.1</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initAnalyticsPage() {
+        if (window.__analyticsPageInitialized) return;
+        window.__analyticsPageInitialized = true;
+
+        const excelBtn = document.getElementById('exportExcelBtn');
+        const pdfBtn = document.getElementById('exportPdfBtn');
+
+        excelBtn?.addEventListener('click', () => alert('Экспорт в Excel будет подключен позже'));
+        pdfBtn?.addEventListener('click', () => alert('Экспорт в PDF будет подключен позже'));
+    }
+
+    window.__analyticsPageInitialized = window.__analyticsPageInitialized || false;
+    initAnalyticsPage();
+    document.addEventListener('spa-page-loaded', initAnalyticsPage);
+</script>
+{% endblock %}

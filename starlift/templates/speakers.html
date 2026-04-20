@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .speakers-page {
+        display: grid;
+        gap: 20px;
+    }
+
+    .speakers-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .page-title-xl {
+        margin: 0;
+        font-size: clamp(28px, 3vw, 40px);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--text-main);
+    }
+
+    .page-subtitle-xl {
+        margin: 8px 0 0;
+        color: var(--text-muted);
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .speakers-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .speakers-meta .badge-active,
+    .speakers-meta .badge-inactive {
+        border-radius: 999px;
+        padding: 10px 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .speaker-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .speaker-toolbar .search-box {
+        flex: 1;
+        min-width: 260px;
+    }
+
+    .action-menu {
+        position: relative;
+        display: inline-flex;
+    }
+
+    .action-menu-panel {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        min-width: 240px;
+        padding: 10px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+        background: var(--panel-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 18px 35px rgba(0,0,0,0.12);
+        display: none;
+        z-index: 40;
+    }
+
+    .action-menu-panel.show {
+        display: block;
+    }
+
+    .action-menu-item {
+        width: 100%;
+        border: none;
+        background: transparent;
+        color: var(--text-main);
+        padding: 10px 12px;
+        border-radius: 12px;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: var(--transition);
+        font-size: 14px;
+    }
+
+    .action-menu-item:hover {
+        background: var(--dropdown-hover);
+        color: var(--sber-green);
+    }
+
+    .speaker-table-wrap {
+        position: relative;
+    }
+
+    .table-toolbar-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+
+    .table-toolbar-top .table-title {
+        margin: 0;
+    }
+
+    .table-note {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .selected-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        font-size: 13px;
+    }
+
+    .table-wrapper thead th:first-child,
+    .table-wrapper tbody td:first-child {
+        width: 52px;
+        text-align: center;
+    }
+
+    .table-wrapper thead th:first-child {
+        cursor: default;
+    }
+
+    .table-wrapper tbody tr {
+        cursor: pointer;
+    }
+
+    .table-wrapper tbody tr td:first-child {
+        cursor: default;
+    }
+
+    @media (max-width: 900px) {
+        .speaker-toolbar .search-box {
+            min-width: 100%;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+    }
+</style>
+
+<div class="speakers-page">
+    <div class="speakers-header animate-fade">
+        <div>
+            <h1 class="page-title-xl">Спикеры</h1>
+            <p class="page-subtitle-xl">Управление базой экспертов, фильтрами и массовыми действиями</p>
+        </div>
+        <div class="speakers-meta">
+            <span class="badge-active"><i class="fa-solid fa-user-group"></i> База спикеров</span>
+            <span class="badge-inactive"><i class="fa-solid fa-shield-halved"></i> Доступ администратора</span>
+        </div>
+    </div>
+
+    <div id="bulkActionBar" class="bulk-action-bar animate-fade" style="animation-delay: 0.05s;">
+        <div class="bulk-action-meta">
+            <span class="bulk-action-count" id="selectedSpeakerCount">0</span>
+            <span>Выбрано элементов для массового действия</span>
+        </div>
+        <div class="bulk-action-group">
+            <button type="button" class="btn-action btn-contact" id="bulkActionsButton">
+                <i class="fa-solid fa-layer-group"></i>
+                Массовые действия
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="content-block animate-fade" style="animation-delay: 0.1s;">
+        <div class="table-toolbar">
+            <div class="table-toolbar-top">
+                <div>
+                    <h2 class="table-title">База спикеров</h2>
+                    <p class="table-note">Поиск, фильтры, сортировка и выбор нескольких строк для массовых операций</p>
+                </div>
+                <div class="selected-hint">
+                    <i class="fa-regular fa-square-check"></i>
+                    Используйте чекбоксы в таблице
+                </div>
+            </div>
+
+            <div class="speaker-toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по имени, стеку или городу">
+                </div>
+
+                <div class="filters-container">
+                    <button type="button" class="filters-toggle" id="filtersToggle" aria-haspopup="dialog" aria-expanded="false">
+                        <i class="fa-solid fa-filter"></i>
+                        Фильтры
+                    </button>
+                    <div class="filters-panel" id="filtersPanel" role="dialog" aria-label="Фильтры">
+                        <div class="filters-panel-title">
+                            <span>Фильтры</span>
+                            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Esc / клик вне — закрыть</span>
+                        </div>
+                        <div class="filters-grid">
+                            <div class="filter-field">
+                                <label for="regionFilter">Регион</label>
+                                <select id="regionFilter" class="select-compact">
+                                    <option value="">Все</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label for="stackFilter">Стек</label>
+                                <select id="stackFilter" class="select-compact">
+                                    <option value="">Все</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label for="statusFilter">Статус</label>
+                                <select id="statusFilter" class="select-compact">
+                                    <option value="all">Все</option>
+                                    <option value="active">Активен</option>
+                                    <option value="inactive">Неактивен</option>
+                                </select>
+                            </div>
+                            <div class="filter-field">
+                                <label>NPS</label>
+                                <div class="nps-range-container">
+                                    <input id="npsMin" class="input-compact" type="number" step="0.1" min="0" max="10" inputmode="decimal" placeholder="Мин. (0-10)">
+                                    <input id="npsMax" class="input-compact" type="number" step="0.1" min="0" max="10" inputmode="decimal" placeholder="Макс. (0-10)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-menu">
+                    <button type="button" class="btn-action btn-contact" id="tableActionsToggle">
+                        <i class="fa-solid fa-ellipsis"></i>
+                        Действия
+                    </button>
+                    <div class="action-menu-panel" id="tableActionsMenu">
+                        <button class="action-menu-item" type="button"><i class="fa-solid fa-paper-plane"></i> Отправить рассылку</button>
+                        <button class="action-menu-item" type="button"><i class="fa-solid fa-user-check"></i> Изменить статус</button>
+                        <button class="action-menu-item" type="button"><i class="fa-solid fa-download"></i> Экспортировать список</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="speaker-table-wrap">
+            <div class="table-wrapper">
+                <table id="speakerTable">
+                    <thead>
+                        <tr>
+                            <th class="bulk-checkbox-cell">
+                                <input type="checkbox" id="selectAllSpeakers" class="custom-checkbox" aria-label="Выбрать все строки">
+                            </th>
+                            <th class="sortable" data-col="0" onclick="sortTable(0)">
+                                <span class="th-inner">
+                                    <span>ФИО спикера</span>
+                                    <span class="sort-indicator hidden" data-indicator-for="0"></span>
+                                </span>
+                            </th>
+                            <th class="sortable" data-col="1" onclick="sortTable(1)">
+                                <span class="th-inner">
+                                    <span>Стек</span>
+                                    <span class="sort-indicator hidden" data-indicator-for="1"></span>
+                                </span>
+                            </th>
+                            <th class="sortable" data-col="2" onclick="sortTable(2)">
+                                <span class="th-inner">
+                                    <span>Регион</span>
+                                    <span class="sort-indicator hidden" data-indicator-for="2"></span>
+                                </span>
+                            </th>
+                            <th class="sortable" data-col="3" onclick="sortTable(3)">
+                                <span class="th-inner">
+                                    <span>Статус</span>
+                                    <span class="sort-indicator hidden" data-indicator-for="3"></span>
+                                </span>
+                            </th>
+                            <th class="sortable" data-col="4" onclick="sortTable(4)">
+                                <span class="th-inner">
+                                    <span>NPS</span>
+                                    <span class="sort-indicator hidden" data-indicator-for="4"></span>
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var speakersData = window.speakersData || [];
+    window.speakersData = speakersData;
+    window.__speakersGlobalListenersBound = window.__speakersGlobalListenersBound || false;
+
+    async function loadSpeakersData() {
+        try {
+            const response = await fetch('/api/speakers/');
+            speakersData = await response.json();
+            window.speakersData = speakersData;
+
+            if (window.selectedSpeakerIds && typeof window.selectedSpeakerIds.clear === 'function') {
+                window.selectedSpeakerIds.clear();
+            }
+
+            if (typeof populateFilters === 'function') {
+                populateFilters();
+            }
+            if (typeof applyFiltersAndRender === 'function') {
+                applyFiltersAndRender();
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке данных спикеров:', error);
+        }
+    }
+
+    function initSpeakersPage() {
+        const actionsToggle = document.getElementById('tableActionsToggle');
+        const actionsMenu = document.getElementById('tableActionsMenu');
+
+        if (actionsToggle && actionsMenu) {
+            actionsToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                actionsMenu.classList.toggle('show');
+            });
+        }
+
+        if (!window.__speakersGlobalListenersBound) {
+            window.__speakersGlobalListenersBound = true;
+            document.addEventListener('click', (event) => {
+                if (!event.target.closest('#tableActionsToggle') && !event.target.closest('#tableActionsMenu')) {
+                    document.getElementById('tableActionsMenu')?.classList.remove('show');
+                }
+            });
+        }
+
+        loadSpeakersData();
+    }
+
+    initSpeakersPage();
+</script>
+{% endblock %}
+
+{% block modals %}
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark modal-close" id="modalClose"></i>
+            <div class="modal-body-split">
+                <div class="modal-left">
+                    <div class="modal-avatar-wrapper">
+                        <img id="modalAvatarImg" src="" alt="Speaker Avatar">
+                        <div class="modal-avatar-name" id="modalAvatarNameText"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-action btn-like" title="Лайк"><i class="fa-regular fa-heart"></i></button>
+                        <button class="btn-action btn-contact"><i class="fa-regular fa-paper-plane"></i> Связаться</button>
+                    </div>
+                </div>
+                <div class="modal-right">
+                    <h2 style="margin-top: 0; color: var(--text-main); margin-bottom: 20px; font-size: 24px;">Профиль спикера</h2>
+
+                    <div class="speaker-detail-grid">
+                        <div class="speaker-detail-item">
+                            <span class="sd-label">Стек</span>
+                            <span class="sd-value" id="modalStackVal"></span>
+                        </div>
+                        <div class="speaker-detail-item">
+                            <span class="sd-label">Город</span>
+                            <span class="sd-value" id="modalCityVal"></span>
+                        </div>
+                        <div class="speaker-detail-item">
+                            <span class="sd-label">NPS</span>
+                            <span class="sd-value" id="modalNpsVal" style="display: flex; align-items: center; gap: 5px;"></span>
+                        </div>
+                        <div class="speaker-detail-item">
+                            <span class="sd-label">Статус</span>
+                            <span class="sd-value" id="modalStatusVal"></span>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 16px; border-bottom: 2px solid var(--sber-green); display: inline-block; margin-bottom: 15px; color: var(--text-main);">Мероприятия и доклады</h3>
+                    <div id="eventList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
