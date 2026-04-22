@@ -58,9 +58,9 @@ async def extract_data_with_tavily(site_url: str) -> list[dict]:
     today = datetime.now().strftime('%Y-%m-%d')
     prompt = (
         f"For events at {site_url}, return ONLY a valid JSON array. "
-        f"Keys: event_title, event_date (in Russian, '10 Мая 2026'), event_location (Russian city), event_link, "
+        f"Keys: event_title, event_date (in Russian, e.g. '10 Мая 2026', or empty string if not specified), event_location (Russian city), event_link, "
         f"event_description (Russian, 3 sentences min), event_status ('future'/'past'), event_schedule (HTML string of <div> elements). "
-        f"IMPORTANT: ALL values MUST be Russian! Use double quotes."
+        f"IMPORTANT: ALL values (other than the title) MUST be Russian! Use double quotes."
     )    
 
     for attempt in range(2):
