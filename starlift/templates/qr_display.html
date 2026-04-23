@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Оцените выступление - {{ speaker.name }} | StarLift{% endblock %}
+
+{% block content %}
+<style>
+    .qr-display-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        text-align: center;
+    }
+
+    .qr-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 50px;
+        max-width: 90vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: var(--transition);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .qr-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--sber-green), #42e67a);
+    }
+
+    .qr-title {
+        font-size: 2.8rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-main);
+        font-weight: 800;
+    }
+
+    .qr-subtitle {
+        font-size: 1.8rem;
+        margin-top: 0;
+        margin-bottom: 40px;
+        color: var(--sber-green);
+        font-weight: 600;
+    }
+
+    .qr-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 16px;
+        display: inline-block;
+        border: 4px solid var(--border-color);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+    }
+
+    .qr-box:hover {
+        transform: scale(1.02);
+    }
+
+    .qr-img {
+        width: 350px;
+        height: 350px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .qr-footer {
+        margin-top: 30px;
+        font-size: 1.4rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        font-weight: 500;
+    }
+    
+    .event-badge {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 8px 16px;
+        background-color: var(--sber-green);
+        color: white;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="qr-display-container">
+    <div class="qr-card animate-fade">
+        <h1 class="qr-title">Оцените выступление</h1>
+        <h2 class="qr-subtitle">{{ speaker.name }}</h2>
+        
+        <div class="qr-box">
+            <img src="data:image/png;base64,{{ qr_image_base64 }}" alt="QR Code" class="qr-img">
+        </div>
+        
+        <div class="qr-footer">
+            Наведите камеру смартфона, чтобы оставить отзыв
+            <br>
+            <span class="event-badge">{{ event.title }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

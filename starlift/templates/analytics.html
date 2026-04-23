@@ -185,6 +185,52 @@
         color: var(--text-main);
     }
 
+    .nps-neon {
+        font-size: 56px;
+        font-weight: 800;
+        color: var(--cyan-color, #00ffff);
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        margin: 10px 0;
+        letter-spacing: -1px;
+    }
+
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .comment-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    .comment-item p {
+        margin: 5px 0 0;
+        color: #fff;
+    }
+
+    .comment-meta {
+        font-size: 13px;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .speaker-select {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        outline: none;
+    }
+
     @media (max-width: 1100px) {
         .analytics-kpis,
         .analytics-grid {
@@ -203,84 +249,69 @@
 <div class="analytics-page">
     <div class="analytics-header animate-fade">
         <div>
-            <h1 class="analytics-title">Аналитика</h1>
-            <p class="analytics-subtitle">Наглядные показатели по базе, активности и качеству выступлений</p>
+            <h1 class="analytics-title">Аналитика спикера</h1>
+            <p class="analytics-subtitle">Наглядные показатели по активности и качеству выступлений</p>
         </div>
         <div class="analytics-actions">
+            <form method="get" id="speakerFilterForm">
+                <select name="speaker_id" class="speaker-select" onchange="document.getElementById('speakerFilterForm').submit()">
+                    {% for s in speakers %}
+                        <option value="{{ s.id }}" {% if speaker and speaker.id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
         </div>
     </div>
 
+    {% if speaker %}
     <div class="analytics-kpis animate-fade" style="animation-delay: 0.08s;">
-        <div class="stat-card metric-card">
-            <div class="metric-label">Новые спикеры за месяц</div>
-            <div class="metric-value">18</div>
-            <div class="metric-delta">+12% к прошлому периоду</div>
+        <div class="stat-card metric-card" style="grid-column: span 1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:30px;">
+            <div class="metric-label" style="font-size: 16px;">Общий NPS</div>
+            <div class="nps-neon">
+                {% if nps_score is not None %}
+                    {{ nps_score }}
+                {% else %}
+                    —
+                {% endif %}
+            </div>
+            <div class="metric-delta" style="color: var(--text-muted); font-weight: normal;">
+                % Сторонников - % Критиков
+            </div>
         </div>
-        <div class="stat-card metric-card">
-            <div class="metric-label">Активные города</div>
-            <div class="metric-value">14</div>
-            <div class="metric-delta">Стабильный рост покрытия</div>
-        </div>
-        <div class="stat-card metric-card">
-            <div class="metric-label">Проведено мероприятий</div>
-            <div class="metric-value">18</div>
-            <div class="metric-delta">6 запланировано далее</div>
+        <div class="stat-card metric-card" style="justify-content: center; text-align: center;">
+            <div class="metric-label" style="font-size: 16px;">Всего отзывов</div>
+            <div class="metric-value" style="font-size: 48px; margin: 10px 0;">{{ total_feedbacks }}</div>
+            <div class="metric-delta" style="color: var(--text-muted); font-weight: normal;">Количество полученных оценок</div>
         </div>
     </div>
-
-    <div class="analytics-grid">
-        <div class="content-block chart-block animate-fade" style="animation-delay: 0.12s;">
-            <h2 class="chart-title"><i class="fa-solid fa-chart-line"></i> Динамика роста базы спикеров</h2>
-            <div class="chart-placeholder">
-                <div class="chart-placeholder-inner">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <div>Контейнер под линейный график</div>
-                    <div style="margin-top: 6px; font-size: 13px;">Подключите Chart.js или ApexCharts к блоку с id <b>speakerGrowthChart</b></div>
+    
+    <div class="analytics-grid" style="margin-top: 20px;">
+        <div class="content-block chart-block animate-fade" style="grid-column: span 2; animation-delay: 0.12s; min-height: auto;">
+            <h2 class="chart-title"><i class="fa-solid fa-comment-dots"></i> Комментарии слушателей</h2>
+            {% if feedbacks %}
+            <div class="comments-list">
+                {% for fb in feedbacks %}
+                <div class="comment-item">
+                    <div class="comment-meta">
+                        <span>Оценка: <strong style="color: var(--cyan-color, #00ffff);">{{ fb.score }}</strong> / 10</span>
+                        <span>{{ fb.created_at|date:"d.m.Y H:i" }} | {{ fb.event.title }}</span>
+                    </div>
+                    {% if fb.comment %}
+                        <p>{{ fb.comment }}</p>
+                    {% else %}
+                        <p style="color: var(--text-muted); font-style: italic;">Без текстового комментария</p>
+                    {% endif %}
                 </div>
+                {% endfor %}
             </div>
-        </div>
-
-        <div class="content-block chart-block animate-fade" style="animation-delay: 0.16s;">
-            <h2 class="chart-title"><i class="fa-solid fa-chart-pie"></i> Распределение стека технологий</h2>
-            <div class="chart-placeholder">
-                <div class="chart-placeholder-inner">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <div>Контейнер под Pie Chart</div>
-                    <div style="margin-top: 6px; font-size: 13px;">Используйте блок с id <b>stackDistributionChart</b></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="content-block chart-block animate-fade" style="animation-delay: 0.20s;">
-            <h2 class="chart-title"><i class="fa-solid fa-filter"></i> Воронка: от инвайта до выступления</h2>
-            <div class="chart-placeholder">
-                <div class="funnel" id="inviteFunnel">
-                    <div class="funnel-step funnel-1"><span>Инвайтов отправлено</span><span>420</span></div>
-                    <div class="funnel-step funnel-2"><span>Ответили</span><span>168</span></div>
-                    <div class="funnel-step funnel-3"><span>Подтвердили участие</span><span>92</span></div>
-                    <div class="funnel-step funnel-4"><span>Выступили</span><span>54</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="content-block chart-block animate-fade" style="animation-delay: 0.24s;">
-            <h2 class="chart-title"><i class="fa-solid fa-location-dot"></i> Корреляция Город - NPS</h2>
-            <div class="chart-placeholder">
-                <div class="chart-placeholder-inner" style="width:100%; max-width:none;">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <div>Контейнер под scatter / heatmap / bubble chart</div>
-                    <table class="mini-table" style="margin-top: 18px;">
-                        <tbody>
-                            <tr><td>Москва</td><td style="text-align:right;"><span class="city-pill">9.7</span></td></tr>
-                            <tr><td>Санкт-Петербург</td><td style="text-align:right;"><span class="city-pill">9.5</span></td></tr>
-                            <tr><td>Казань</td><td style="text-align:right;"><span class="city-pill">9.3</span></td></tr>
-                            <tr><td>Новосибирск</td><td style="text-align:right;"><span class="city-pill">9.1</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            {% else %}
+            <p style="color: var(--text-muted); margin-top: 15px;">Пока нет отзывов.</p>
+            {% endif %}
         </div>
     </div>
+    {% else %}
+    <p>Спикеры не найдены.</p>
+    {% endif %}
 </div>
 
 <script>

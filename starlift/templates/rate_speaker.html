@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Оценка спикера | StarLift{% endblock %}
+
+{% block content %}
+<style>
+    .rate-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .speaker-info {
+        margin-bottom: 30px;
+    }
+
+    .speaker-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 2px solid var(--cyan-color, #00ffff);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .speaker-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .event-title {
+        font-size: 16px;
+        color: var(--cyan-color, #00ffff);
+        opacity: 0.8;
+    }
+
+    .rate-title {
+        font-size: 20px;
+        color: #fff;
+        margin-bottom: 25px;
+    }
+
+    .score-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        max-width: 350px;
+        margin-bottom: 20px;
+    }
+
+    .score-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .score-btn:active, .score-btn.active {
+        background: var(--cyan-color, #00ffff);
+        color: #000;
+        border-color: var(--cyan-color, #00ffff);
+        transform: scale(1.05);
+        box-shadow: 0 0 10px #64FFDA;
+    }
+
+    .score-btn:hover {
+        background: rgba(100, 255, 218, 0.2);
+        box-shadow: 0 0 10px #64FFDA;
+        border-color: #64FFDA;
+        transform: translateY(-2px);
+    }
+
+    .submit-btn {
+        background: var(--cyan-color, #00ffff);
+        color: #000;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 25px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .submit-btn:disabled {
+        background: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.5);
+        cursor: not-allowed;
+    }
+
+    .submit-btn:not(:disabled):hover {
+        box-shadow: 0 0 10px #64FFDA;
+        transform: translateY(-2px);
+    }
+
+    .message-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        max-width: 400px;
+    }
+</style>
+
+<div class="rate-container">
+    {% if error %}
+        <div class="message-card" style="border-color: #ff4d4d; box-shadow: 0 0 10px #ff4d4d;">
+            <p style="color: #ff4d4d; font-size: 18px;">
+                {{ error }}
+            </p>
+            <a href="{% url 'submit_feedback' event.id speaker.id %}" style="display: inline-block; margin-top: 20px; color: var(--cyan-color, #64FFDA); text-decoration: none;">Попробовать снова</a>
+        </div>
+    {% elif already_voted %}
+        <div class="message-card">
+            {% if success_msg %}
+                <h2 style="color: #fff; margin-bottom: 15px;">Ура! 🎉</h2>
+                <p style="color: rgba(255, 255, 255, 0.8); font-size: 18px;">
+                    Спасибо, ваш голос уже учтен.
+                </p>
+            {% else %}
+                <h2 style="color: #fff; margin-bottom: 15px;">Упс! 😅</h2>
+                <p style="color: rgba(255, 255, 255, 0.8); font-size: 18px;">
+                    Вы уже оставили отзыв этому спикеру на данном мероприятии.
+                </p>
+            {% endif %}
+            <a href="/" style="display: inline-block; margin-top: 20px; color: var(--cyan-color, #64FFDA); text-decoration: none;">На главную</a>
+        </div>
+    {% else %}
+        <div class="speaker-info">
+            {% if speaker.img %}
+                <img src="{{ speaker.img }}" alt="{{ speaker.name }}" class="speaker-avatar">
+            {% else %}
+                <div class="speaker-avatar" style="display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.1); font-size: 30px;">
+                    👤
+                </div>
+            {% endif %}
+            <div class="speaker-name">{{ speaker.name }}</div>
+            <div class="event-title">{{ event.title }}</div>
+        </div>
+
+        <div class="rate-title">Оцените выступление</div>
+
+        <form method="post" id="feedbackForm" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            {% csrf_token %}
+            {{ form.score }}
+            
+            <div class="score-buttons">
+                {% for i in "0123456789"|make_list %}
+                    <button type="button" class="score-btn" data-score="{{ i }}">{{ i }}</button>
+                {% endfor %}
+                <button type="button" class="score-btn" data-score="10">10</button>
+            </div>
+
+            {{ form.comment }}
+
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>Отправить</button>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const scoreBtns = document.querySelectorAll('.score-btn');
+        const scoreInput = document.getElementById('id_score');
+        const submitBtn = document.getElementById('submitBtn');
+
+        scoreBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all
+                scoreBtns.forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked
+                this.classList.add('active');
+                
+                // Set hidden input value
+                scoreInput.value = this.getAttribute('data-score');
+                
+                // Enable submit button
+                submitBtn.disabled = false;
+            });
+        });
+    });
+</script>
+{% endblock %}

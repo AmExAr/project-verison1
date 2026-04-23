@@ -6,7 +6,20 @@ from django import forms
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError
-from .models import Speaker
+from .models import Speaker, Feedback
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['score', 'comment']
+        widgets = {
+            'score': forms.HiddenInput(),
+            'comment': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Оставьте свой комментарий (необязательно)',
+                'style': 'width: 100%; border-radius: 12px; padding: 12px; background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); min-height: 100px; resize: vertical; margin-top: 20px;'
+            }),
+        }
 
 class SpeakerForm(forms.ModelForm):
     upload_image = forms.ImageField(required=False)
