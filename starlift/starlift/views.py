@@ -1,8 +1,9 @@
-﻿from django.shortcuts import render
+﻿from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Case, When, Value, IntegerField
+from django.contrib.auth.decorators import user_passes_test
 from .models import Speaker, Event
-
+from .forms import SpeakerForm
 
 def index_view(request):
     return render(request, 'index.html')
@@ -70,3 +71,34 @@ def events_api(request):
     except Exception as e:
         print(f"Error fetching events: {e}")
         return JsonResponse([], safe=False)
+
+@user_passes_test(lambda u: u.is_superuser)
+def speaker_add(request):
+    if request.method == 'POST':
+        form = SpeakerForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('speakers')
+    else:
+        form = SpeakerForm()
+    return render(request, 'speaker_form.html', {'form': form, 'title': 'Добавить спикера'})
+
+@user_passes_test(lambda u: u.is_superuser)
+def speaker_edit(request, pk):
+    speaker = get_object_or_404(Speaker, pk=pk)
+    if request.method == 'POST':
+        form = SpeakerForm(request.POST, request.FILES, instance=speaker)
+        if form.is_valid():
+            form.save()
+            return redirect('speakers')
+    else:
+        form = SpeakerForm(instance=speaker)
+    return render(request, 'speaker_form.html', {'form': form, 'title': 'Редактировать спикера'})
+
+@user_passes_test(lambda u: u.is_superuser)
+def speaker_delete(request, pk):
+    speaker = get_object_or_404(Speaker, pk=pk)
+    if request.method == 'POST':
+        speaker.delete()
+        return redirect('speakers')
+    return render(request, 'speaker_confirm_delete.html', {'speaker': speaker})

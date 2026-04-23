@@ -198,6 +198,11 @@
             </div>
 
             <div class="speaker-toolbar">
+                {% if user.is_superuser %}
+                <a href="{% url 'speaker_add' %}" class="btn-action btn-contact" style="flex: none; display: inline-flex; padding: 10px 20px; white-space: nowrap; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-plus"></i> Добавить спикера
+                </a>
+                {% endif %}
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" placeholder="Поиск по имени, стеку или городу">
@@ -244,18 +249,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="action-menu">
-                    <button type="button" class="btn-action btn-contact" id="tableActionsToggle">
-                        <i class="fa-solid fa-ellipsis"></i>
-                        Действия
-                    </button>
-                    <div class="action-menu-panel" id="tableActionsMenu">
-                        <button class="action-menu-item" type="button"><i class="fa-solid fa-paper-plane"></i> Отправить рассылку</button>
-                        <button class="action-menu-item" type="button"><i class="fa-solid fa-user-check"></i> Изменить статус</button>
-                        <button class="action-menu-item" type="button"><i class="fa-solid fa-download"></i> Экспортировать список</button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -296,6 +289,7 @@
                                     <span class="sort-indicator hidden" data-indicator-for="4"></span>
                                 </span>
                             </th>
+                            <th id="actionsHeader"></th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -306,6 +300,7 @@
 </div>
 
 <script>
+    window.isSuperuser = {% if user.is_superuser %}true{% else %}false{% endif %};
     var speakersData = window.speakersData || [];
     window.speakersData = speakersData;
     window.__speakersGlobalListenersBound = window.__speakersGlobalListenersBound || false;
@@ -350,6 +345,13 @@
         if (value === '' || value == null) return null;
         const n = Number(value);
         return Number.isFinite(n) ? n : null;
+    }
+    
+    function getAvatarUrl(img, size = 150) {
+        if (img && (img.startsWith('/media/') || img.startsWith('http'))) {
+            return img;
+        }
+        return `https://i.pravatar.cc/${size}?img=${img}`;
     }
 
     function updateSortIndicators() {
@@ -434,6 +436,15 @@
         const body = document.getElementById('tableBody');
         if (!body) return;
 
+        const actionsHeader = document.getElementById('actionsHeader');
+        if (actionsHeader) {
+            if (window.isSuperuser) {
+                actionsHeader.innerText = 'Действия';
+            } else {
+                actionsHeader.innerText = '';
+            }
+        }
+
         body.innerHTML = data.map((s, i) => `
             <tr class="${i % 2 !== 0 ? 'alt-row' : ''}">
                 <td class="bulk-checkbox-cell" onclick="event.stopPropagation()">
@@ -441,7 +452,7 @@
                 </td>
                 <td onclick="showEvents(${s.id})">
                     <div class="speaker-info">
-                        <img src="https://i.pravatar.cc/150?img=${s.img}" class="avatar">
+                        <img src="${getAvatarUrl(s.img, 150)}" class="avatar" style="object-fit: cover;">
                         <div><strong>${s.name}</strong></div>
                     </div>
                 </td>
@@ -449,6 +460,15 @@
                 <td onclick="showEvents(${s.id})">${s.city}</td>
                 <td onclick="showEvents(${s.id})"><span class="${s.status === 'Активен' ? 'badge-active' : 'badge-inactive'}">${s.status}</span></td>
                 <td onclick="showEvents(${s.id})"><div class="nps-val">${s.nps} <i class="fa-solid fa-star"></i></div></td>
+                ${window.isSuperuser ? `
+                <td class="actions-cell" onclick="event.stopPropagation()">
+                    <a href="/speakers/edit/${s.id}/" class="btn-action" style="color: var(--text-main); text-decoration: none;" title="Редактировать"><i class="fa-solid fa-pen"></i></a>
+                    <form method="POST" action="/speakers/delete/${s.id}/" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить этого спикера?');">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <button type="submit" class="btn-action btn-danger" style="background: none; border: none; cursor: pointer; color: var(--text-main);" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </td>
+                ` : '<td></td>'}
             </tr>
         `).join('');
     }
@@ -469,7 +489,7 @@
         const speaker = speakersData.find(s => s.id === id);
         if (!speaker) return;
         
-        document.getElementById('modalAvatarImg').src = `https://i.pravatar.cc/300?img=${speaker.img}`;
+        document.getElementById('modalAvatarImg').src = getAvatarUrl(speaker.img, 300);
         document.getElementById('modalAvatarNameText').innerText = speaker.name;
         
         document.getElementById('modalStackVal').innerText = speaker.stack;
