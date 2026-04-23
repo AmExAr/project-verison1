@@ -60,45 +60,11 @@
 ### Требования
 * Python 3.10+
 * PostgreSQL
-* Python env
+* Python benv
 
 ### Шаги установки:
 
-1. **Клонировать репозиторий:**
-   `ash
-   git clone <url-репозитория>
-   cd project-version1
-   `
-
-2. **Создать и активировать виртуальное окружение:**
-   `ash
-   python -m venv .venv
-   
-   # Windows:
-   .venv\Scripts\activate
-   # macOS/Linux:
-   source .venv/bin/activate
-   `
-
-3. **Установить зависимости:**
-   `ash
-   pip install -r requirements.txt
-   playwright install chromium
-   `
-
-4. **Настроить БД:** Убедитесь, что параметры подключения к PostgreSQL в starlift/starlift/settings.py актуальны для вашей среды.
-
-5. **Выполнить миграции:**
-   `ash
-   cd starlift
-   python manage.py migrate
-   `
-
-6. **Запустить сервер:**
-   `ash
-   python manage.py runserver
-   `
-   *Дашборд будет доступен по адресу http://127.0.0.1:8000/*
+> в разработке...
 
 ## 📖 Архитектура
 Дополнительная документация и схема архитектуры находятся в docs/architecture.md.
