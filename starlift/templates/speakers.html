@@ -49,11 +49,16 @@
         align-items: center;
         gap: 12px;
         flex-wrap: wrap;
+        width: 100%;
     }
 
     .speaker-toolbar .search-box {
         flex: 1;
         min-width: 260px;
+    }
+    
+    .speaker-toolbar .search-box input {
+        width: 100%;
     }
 
     .action-menu {
@@ -133,22 +138,8 @@
         font-size: 13px;
     }
 
-    .table-wrapper thead th:first-child,
-    .table-wrapper tbody td:first-child {
-        width: 52px;
-        text-align: center;
-    }
-
-    .table-wrapper thead th:first-child {
-        cursor: default;
-    }
-
     .table-wrapper tbody tr {
         cursor: pointer;
-    }
-
-    .table-wrapper tbody tr td:first-child {
-        cursor: default;
     }
 
     @media (max-width: 900px) {
@@ -169,45 +160,24 @@
             <p class="page-subtitle-xl">Управление базой экспертов, фильтрами и массовыми действиями</p>
         </div>
         <div class="speakers-meta">
-            <span class="badge-active"><i class="fa-solid fa-user-group"></i> База спикеров</span>
             <span class="badge-inactive"><i class="fa-solid fa-shield-halved"></i> Доступ администратора</span>
-        </div>
-    </div>
-
-    <div id="bulkActionBar" class="bulk-action-bar animate-fade" style="animation-delay: 0.05s;">
-        <div class="bulk-action-meta">
-            <span class="bulk-action-count" id="selectedSpeakerCount">0</span>
-            <span>Выбрано элементов для массового действия</span>
-        </div>
-        <div class="bulk-action-group">
-            <button type="button" class="btn-action btn-contact" id="bulkActionsButton">
-                <i class="fa-solid fa-layer-group"></i>
-                Массовые действия
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
         </div>
     </div>
 
     <div class="content-block animate-fade" style="animation-delay: 0.1s;">
         <div class="table-toolbar">
-            <div class="table-toolbar-top">
-                <div>
-                    <h2 class="table-title">База спикеров</h2>
-                    <p class="table-note">Поиск, фильтры, сортировка и выбор нескольких строк для массовых операций</p>
-                </div>
-            </div>
 
             <div class="speaker-toolbar">
-                {% if user.is_superuser %}
-                <a href="{% url 'speaker_add' %}" class="btn-action btn-contact" style="flex: none; display: inline-flex; padding: 10px 20px; white-space: nowrap; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-plus"></i> Добавить спикера
-                </a>
-                {% endif %}
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" placeholder="Поиск по имени, стеку или городу">
                 </div>
 
+                {% if user.is_superuser %}
+                <a href="{% url 'speaker_add' %}" class="btn-action btn-contact" style="flex: none; display: inline-flex; padding: 10px 20px; white-space: nowrap; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-plus"></i> Добавить спикера
+                </a>
+                {% endif %}
                 <div class="filters-container">
                     <button type="button" class="filters-toggle" id="filtersToggle" aria-haspopup="dialog" aria-expanded="false">
                         <i class="fa-solid fa-filter"></i>
@@ -235,8 +205,8 @@
                                 <label for="statusFilter">Статус</label>
                                 <select id="statusFilter" class="select-compact">
                                     <option value="all">Все</option>
-                                    <option value="active">Активен</option>
-                                    <option value="inactive">Неактивен</option>
+                                    <option value="active">Авторизован</option>
+                                    <option value="inactive">Неавторизован</option>
                                 </select>
                             </div>
                             <div class="filter-field">
@@ -257,8 +227,6 @@
                 <table id="speakerTable">
                     <thead>
                         <tr>
-                            <th class="bulk-checkbox-cell">
-                            </th>
                             <th class="sortable" data-col="0" onclick="sortTable(0)">
                                 <span class="th-inner">
                                     <span>ФИО спикера</span>
@@ -415,8 +383,8 @@
             .filter(s => !stackQ || normalizeText(s.stack).includes(stackQ))
             .filter(s => {
                 if (statusVal === 'all') return true;
-                if (statusVal === 'active') return s.status === 'Активен';
-                if (statusVal === 'inactive') return s.status === 'Неактивен';
+                if (statusVal === 'active') return s.status === 'Авторизован';
+                if (statusVal === 'inactive') return s.status === 'Неавторизован';
                 return true;
             })
             .filter(s => {
@@ -447,9 +415,6 @@
 
         body.innerHTML = data.map((s, i) => `
             <tr class="${i % 2 !== 0 ? 'alt-row' : ''}">
-                <td class="bulk-checkbox-cell" onclick="event.stopPropagation()">
-                    <input type="checkbox" class="custom-checkbox speaker-checkbox" value="${s.id}" aria-label="Выбрать спикера">
-                </td>
                 <td onclick="showEvents(${s.id})">
                     <div class="speaker-info">
                         <img src="${getAvatarUrl(s.img, 150)}" class="avatar" style="object-fit: cover;">
@@ -500,12 +465,42 @@
         statusContainer.innerHTML = `<span class="${speaker.status === 'Активен' ? 'badge-active' : 'badge-inactive'}">${speaker.status}</span>`;
 
         const list = document.getElementById('eventList');
-        list.innerHTML = (speaker.events || []).map(e => `
-            <div class="event-item" style="padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                <span>${e.t}</span>
-                <span class="status-pill ${e.s}" style="font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600; ${e.s === 'past' ? 'background: var(--status-past-bg); color: var(--status-past-color);' : 'background: var(--status-future-bg); color: var(--status-future-color);'}">${e.s === 'past' ? 'Прошло' : 'Будет'}</span>
-            </div>
-        `).join('') || '<p style="color: var(--text-muted); font-size: 14px;">Записей не найдено</p>';
+        
+        let contentHtml = '';
+        
+        if (speaker.events && speaker.events.length > 0) {
+            contentHtml += `<div style="margin-bottom: 16px;">
+                <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--text-main);">Мероприятия</h4>
+                ${speaker.events.map(e => `
+                <div class="event-item" style="padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 14px;">${e.t}</span>
+                    <span class="status-pill ${e.s}" style="font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600; ${e.s === 'past' ? 'background: var(--status-past-bg); color: var(--status-past-color);' : 'background: var(--status-future-bg); color: var(--status-future-color);'}">${e.s === 'past' ? 'Прошло' : 'Будет'}</span>
+                </div>
+                `).join('')}
+            </div>`;
+        }
+
+        if (speaker.feedbacks && speaker.feedbacks.length > 0) {
+            contentHtml += `<div>
+                <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--text-main);">Отзывы</h4>
+                <div style="max-height: 200px; overflow-y: auto; padding-right: 8px;">
+                    ${speaker.feedbacks.map(f => `
+                    <div style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; background: var(--glass-bg);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <strong style="color: var(--sber-green); font-size: 13px;"><i class="fa-solid fa-star"></i> ${f.score}/10</strong>
+                            <span style="color: var(--text-muted); font-size: 11px;">${f.date}</span>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">${f.event_title}</div>
+                        <p style="margin: 0; font-size: 13px; color: var(--text-main);">${f.comment ? f.comment : '<em style="color: var(--text-muted);">Без комментария</em>'}</p>
+                    </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        } else {
+            contentHtml += `<p style="color: var(--text-muted); font-size: 14px;">Отзывов пока нет</p>`;
+        }
+        
+        list.innerHTML = contentHtml || '<p style="color: var(--text-muted); font-size: 14px;">Нет данных</p>';
         
         const overlay = document.getElementById('modalOverlay');
         if (overlay) overlay.style.display = 'flex';

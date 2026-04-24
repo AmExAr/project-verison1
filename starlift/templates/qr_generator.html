@@ -124,24 +124,26 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         const generateBtn = document.getElementById('generateBtn');
         const speakerSelect = document.getElementById('speakerSelect');
         const eventSelect = document.getElementById('eventSelect');
 
-        generateBtn.addEventListener('click', function() {
-            const speakerId = speakerSelect.value;
-            const eventId = eventSelect.value;
+        if (generateBtn) {
+            generateBtn.addEventListener('click', function() {
+                const speakerId = speakerSelect.value;
+                const eventId = eventSelect.value;
 
-            if (!speakerId || !eventId) {
-                alert('Пожалуйста, выберите спикера и мероприятие.');
-                return;
-            }
+                if (!speakerId || !eventId) {
+                    alert('Пожалуйста, выберите спикера и мероприятие.');
+                    return;
+                }
 
-            // Формируем ссылку на основе имеющегося шаблона url - '/speaker/<speaker_id>/event/<event_id>/qr/'
-            const qrUrl = `/speaker/${speakerId}/event/${eventId}/qr/`;
-            window.location.href = qrUrl;
-        });
-    });
+                // Формируем ссылку на основе имеющегося шаблона url - '/speaker/<speaker_id>/event/<event_id>/qr/'
+                const qrUrl = `/speaker/${speakerId}/event/${eventId}/qr/`;
+                window.location.href = qrUrl;
+            });
+        }
+    })();
 </script>
 {% endblock %}

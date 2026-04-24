@@ -96,30 +96,33 @@ def events_view(request):
     return render(request, 'events.html')
 
 def analytics_view(request):
-    speaker_id = request.GET.get('speaker_id')
-    if speaker_id:
-        speaker = get_object_or_404(Speaker, id=speaker_id)
-    else:
-        speaker = Speaker.objects.first()
+    from django.db.models import Avg, Count
 
-    nps_score = None
-    total_feedbacks = 0
-    feedbacks = []
+    feedbacks = Feedback.objects.all().order_by('-created_at')
+    total_feedbacks = feedbacks.count()
 
-    if speaker:
-        nps_score = speaker.calculate_nps()
-        qs = speaker.feedbacks.all().order_by('-created_at')
-        total_feedbacks = qs.count()
-        feedbacks = qs
+    # Средняя оценка
+    avg_score_dict = feedbacks.aggregate(avg_score=Avg('score'))
+    average_score = round(avg_score_dict['avg_score'], 2) if avg_score_dict['avg_score'] is not None else 0
 
-    speakers = Speaker.objects.all()
+    # Распределение оценок
+    distribution = feedbacks.values('score').annotate(count=Count('score')).order_by('-score')
+    score_distribution = {i: 0 for i in range(10, -1, -1)}
+    for item in distribution:
+        score_distribution[item['score']] = item['count']
+
+    # Топ спикеров
+    top_speakers = Speaker.objects.annotate(
+        avg_score=Avg('feedbacks__score'),
+        feedbacks_count=Count('feedbacks')
+    ).filter(feedbacks_count__gt=0).order_by('-avg_score')[:10]
 
     context = {
-        'speaker': speaker,
-        'speakers': speakers,
-        'nps_score': nps_score,
         'total_feedbacks': total_feedbacks,
-        'feedbacks': feedbacks,
+        'average_score': average_score,
+        'score_distribution': score_distribution,
+        'top_speakers': top_speakers,
+        'feedbacks': feedbacks[:10], # recent feedbacks
     }
     return render(request, 'analytics.html', context)
 
@@ -131,6 +134,17 @@ def speakers_api(request):
         speakers = Speaker.objects.all()
         speakers_data = []
         for speaker in speakers:
+            # Получаем отзывы
+            feedbacks_qs = speaker.feedbacks.all().order_by('-created_at')
+            feedbacks_data = []
+            for f in feedbacks_qs:
+                feedbacks_data.append({
+                    "score": f.score,
+                    "comment": f.comment,
+                    "date": f.created_at.strftime("%d.%m.%Y %H:%M"),
+                    "event_title": f.event.title
+                })
+            
             speakers_data.append({
                 "id": speaker.id,
                 "name": speaker.name,
@@ -140,7 +154,8 @@ def speakers_api(request):
                 "status": speaker.status,
                 "nps": float(speaker.nps) if speaker.nps else 0.0,
                 "img": speaker.img,
-                "events": []
+                "events": [{"t": e.title, "s": e.status} for e in speaker.events.all()],
+                "feedbacks": feedbacks_data
             })
         return JsonResponse(speakers_data, safe=False)
     except Exception as e:

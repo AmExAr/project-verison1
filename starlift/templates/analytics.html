@@ -4,324 +4,275 @@
     .analytics-page {
         display: grid;
         gap: 20px;
+        padding: 20px;
     }
 
     .analytics-header {
         display: flex;
         justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-        align-items: flex-end;
+        align-items: center;
+        margin-bottom: 20px;
     }
 
     .analytics-title {
-        margin: 0;
-        font-size: clamp(28px, 3vw, 40px);
+        font-size: 32px;
         font-weight: 800;
-        letter-spacing: -0.04em;
         color: var(--text-main);
-    }
-
-    .analytics-subtitle {
-        margin: 8px 0 0;
-        color: var(--text-muted);
-        font-size: 15px;
-    }
-
-    .analytics-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+        margin: 0;
     }
 
     .analytics-kpis {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
     }
 
     .metric-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
         padding: 20px;
-        display: grid;
-        gap: 10px;
-        min-height: 126px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        backdrop-filter: blur(10px);
     }
 
     .metric-label {
-        font-size: 13px;
+        font-size: 14px;
         color: var(--text-muted);
-        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
     }
 
     .metric-value {
-        font-size: 28px;
+        font-size: 36px;
         font-weight: 800;
-        color: var(--text-main);
-        letter-spacing: -0.04em;
-    }
-
-    .metric-delta {
-        font-size: 12px;
         color: var(--sber-green);
-        font-weight: 700;
     }
 
     .analytics-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 2fr 1fr;
         gap: 20px;
     }
-
-    .chart-block {
-        min-height: 360px;
-        display: grid;
-        gap: 16px;
-    }
-
-    .chart-title {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--text-main);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .chart-placeholder {
-        min-height: 280px;
-        border-radius: 18px;
-        border: 1px dashed var(--border-color);
-        background: var(--glass-bg);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 18px;
-        transition: var(--transition);
-    }
-
-    .chart-placeholder:active {
-        transform: scale(0.98);
-        backdrop-filter: blur(12px);
-    }
-
-    .chart-placeholder::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: linear-gradient(rgba(10,128,59,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(10,128,59,0.04) 1px, transparent 1px);
-        background-size: 28px 28px;
-        opacity: 0.45;
-        pointer-events: none;
-    }
-
-    .chart-placeholder-inner {
-        position: relative;
-        z-index: 1;
-        text-align: center;
-        color: var(--text-muted);
-        max-width: 340px;
-    }
-
-    .chart-placeholder-inner i {
-        font-size: 30px;
-        color: var(--sber-green);
-        margin-bottom: 10px;
-    }
-
-    .funnel {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        width: 100%;
-    }
-
-    .funnel-step {
-        position: relative;
-        min-height: 54px;
-        border-radius: 16px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px 16px;
-        box-sizing: border-box;
-        color: #fff;
-        font-weight: 700;
-        box-shadow: 0 12px 20px rgba(10,128,59,0.08);
-        gap: 8px;
-    }
-
-    .funnel-step span:last-child {
-        font-size: 13px;
-        font-weight: 600;
-        opacity: 0.9;
-    }
-
-    .funnel-1 { width: 100%; background: linear-gradient(135deg, rgba(10,128,59,0.92), rgba(10,128,59,0.72)); }
-    .funnel-2 { width: 90%; background: linear-gradient(135deg, rgba(10,128,59,0.80), rgba(10,128,59,0.62)); }
-    .funnel-3 { width: 80%; background: linear-gradient(135deg, rgba(10,128,59,0.68), rgba(10,128,59,0.50)); }
-    .funnel-4 { width: 70%; background: linear-gradient(135deg, rgba(10,128,59,0.56), rgba(10,128,59,0.40)); }
-
-    .mini-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .mini-table td {
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 14px;
-    }
-
-    .city-pill {
-        padding: 7px 12px;
-        border-radius: 999px;
-        background: var(--light-green);
-        border: 1px solid var(--border-color);
-        font-weight: 700;
-        color: var(--text-main);
-    }
-
-    .nps-neon {
-        font-size: 56px;
-        font-weight: 800;
-        color: var(--cyan-color, #00ffff);
-        text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-        margin: 10px 0;
-        letter-spacing: -1px;
-    }
-
-    .comments-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin-top: 20px;
-    }
-
-    .comment-item {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 15px;
-    }
-
-    .comment-item p {
-        margin: 5px 0 0;
-        color: #fff;
-    }
-
-    .comment-meta {
-        font-size: 13px;
-        color: var(--text-muted);
-        display: flex;
-        justify-content: space-between;
-    }
     
-    .speaker-select {
-        background: var(--glass-bg);
-        border: 1px solid var(--border-color);
-        color: var(--text-main);
-        padding: 10px 15px;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        outline: none;
-    }
-
-    @media (max-width: 1100px) {
-        .analytics-kpis,
-        .analytics-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-    }
-
-    @media (max-width: 700px) {
-        .analytics-kpis,
+    @media (max-width: 1024px) {
         .analytics-grid {
             grid-template-columns: 1fr;
         }
     }
-</style>
 
-<div class="analytics-page">
-    <div class="analytics-header animate-fade">
-        <div>
-            <h1 class="analytics-title">Аналитика спикера</h1>
-            <p class="analytics-subtitle">Наглядные показатели по активности и качеству выступлений</p>
-        </div>
-        <div class="analytics-actions">
-            <form method="get" id="speakerFilterForm">
-                <select name="speaker_id" class="speaker-select" onchange="document.getElementById('speakerFilterForm').submit()">
-                    {% for s in speakers %}
-                        <option value="{{ s.id }}" {% if speaker and speaker.id == s.id %}selected{% endif %}>{{ s.name }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-        </div>
-    </div>
-
-    {% if speaker %}
-    <div class="analytics-kpis animate-fade" style="animation-delay: 0.08s;">
-        <div class="stat-card metric-card" style="grid-column: span 1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:30px;">
-            <div class="metric-label" style="font-size: 16px;">Общий NPS</div>
-            <div class="nps-neon">
-                {% if nps_score is not None %}
-                    {{ nps_score }}
-                {% else %}
-                    —
-                {% endif %}
-            </div>
-            <div class="metric-delta" style="color: var(--text-muted); font-weight: normal;">
-                % Сторонников - % Критиков
-            </div>
-        </div>
-        <div class="stat-card metric-card" style="justify-content: center; text-align: center;">
-            <div class="metric-label" style="font-size: 16px;">Всего отзывов</div>
-            <div class="metric-value" style="font-size: 48px; margin: 10px 0;">{{ total_feedbacks }}</div>
-            <div class="metric-delta" style="color: var(--text-muted); font-weight: normal;">Количество полученных оценок</div>
-        </div>
-    </div>
-    
-    <div class="analytics-grid" style="margin-top: 20px;">
-        <div class="content-block chart-block animate-fade" style="grid-column: span 2; animation-delay: 0.12s; min-height: auto;">
-            <h2 class="chart-title"><i class="fa-solid fa-comment-dots"></i> Комментарии слушателей</h2>
-            {% if feedbacks %}
-            <div class="comments-list">
-                {% for fb in feedbacks %}
-                <div class="comment-item">
-                    <div class="comment-meta">
-                        <span>Оценка: <strong style="color: var(--cyan-color, #00ffff);">{{ fb.score }}</strong> / 10</span>
-                        <span>{{ fb.created_at|date:"d.m.Y H:i" }} | {{ fb.event.title }}</span>
-                    </div>
-                    {% if fb.comment %}
-                        <p>{{ fb.comment }}</p>
-                    {% else %}
-                        <p style="color: var(--text-muted); font-style: italic;">Без текстового комментария</p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p style="color: var(--text-muted); margin-top: 15px;">Пока нет отзывов.</p>
-            {% endif %}
-        </div>
-    </div>
-    {% else %}
-    <p>Спикеры не найдены.</p>
-    {% endif %}
-</div>
-
-<script>
-    function initAnalyticsPage() {
-        if (window.__analyticsPageInitialized) return;
-        window.__analyticsPageInitialized = true;
+    .panel {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
     }
 
-    window.__analyticsPageInitialized = window.__analyticsPageInitialized || false;
-    initAnalyticsPage();
-    document.addEventListener('spa-page-loaded', initAnalyticsPage);
+    .panel-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+    }
+
+    .top-speakers-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .top-speakers-table th, .top-speakers-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .top-speakers-table th {
+        background: var(--th-bg);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 12px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .top-speakers-table tr:hover {
+        background: var(--tr-hover);
+    }
+
+    .speaker-link {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .speaker-link:hover {
+        color: var(--sber-green);
+    }
+
+    .score-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: var(--light-green);
+        color: var(--sber-green-hover);
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .chart-container {
+        position: relative;
+        flex-grow: 1;
+        min-height: 250px;
+        width: 100%;
+    }
+</style>
+
+<div class="analytics-page animate-fade">
+    <div class="analytics-header">
+        <h1 class="analytics-title">Общая аналитика</h1>
+    </div>
+
+    <!-- Общие KPI -->
+    <div class="analytics-kpis">
+        <div class="metric-card">
+            <div class="metric-label">Всего отзывов</div>
+            <div class="metric-value">{{ total_feedbacks }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Средний балл</div>
+            <div class="metric-value">{{ average_score|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+        <!-- Топ спикеров -->
+        <div class="panel">
+            <div class="panel-title"><i class="fa-solid fa-trophy" style="color: var(--sber-green); margin-right: 8px;"></i>Топ лучших спикеров</div>
+            <div style="overflow-x: auto;">
+                <table class="top-speakers-table">
+                    <thead>
+                        <tr>
+                            <th>Спикер</th>
+                            <th>Средний балл</th>
+                            <th>Отзывов</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for speaker in top_speakers %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'speakers' %}?id={{ speaker.id }}" class="speaker-link">{{ speaker.name }}</a>
+                            </td>
+                            <td>
+                                <span class="score-badge">{{ speaker.avg_score|floatformat:2 }}</span>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 14px;">{{ speaker.feedbacks_count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 20px;">Нет данных о спикерах с отзывами</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- График распределения -->
+        <div class="panel">
+            <div class="panel-title"><i class="fa-solid fa-chart-pie" style="color: var(--sber-green); margin-right: 8px;"></i>Распределение оценок</div>
+            <div class="chart-container">
+                <canvas id="scoreChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const canvas = document.getElementById('scoreChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        // Prepare data from Django context
+        const labelsData = [
+            {% for score, count in score_distribution.items %}
+                '{{ score }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        const countsData = [
+            {% for score, count in score_distribution.items %}
+                {{ count }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDarkTheme ? '#A0A5AA' : '#5B7565';
+        const mainColor = '#0A803B'; // sber-green
+        const bgColor = isDarkTheme ? 'rgba(33, 160, 56, 0.4)' : 'rgba(10, 128, 59, 0.4)';
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsData.reverse(),
+                datasets: [{
+                    label: 'Количество оценок',
+                    data: countsData.reverse(),
+                    backgroundColor: bgColor,
+                    borderColor: mainColor,
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return 'Оценка: ' + context[0].label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            color: textColor
+                        },
+                        grid: {
+                            color: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
 </script>
 {% endblock %}
