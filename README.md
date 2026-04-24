@@ -1,113 +1,70 @@
-# StarLift
+﻿# StarLift
 
-> Платформа учёта и оценки корпоративных спикеров.
+**StarLift** — это платформа (MVP) для учёта, оценки и управления корпоративными спикерами. Проект автоматизирует сбор данных об участии сотрудников в конференциях, анализирует их активность (формируя скоринг) и предоставляет удобный дашборд для HR-специалистов и DevRel-менеджеров.
 
-## Быстрый старт
+## ✨ Ключевые возможности
 
-### Предварительные требования
+*   **Центлизованная база спикеров и мероприятий:** Единое хранилище всех выступлений и спикеров компании, их специализаций (stack), статусов и других метрик.
+*   **Автоматический парсинг конференций:** Встроенные скрипты скрапинга (playwright и др.) собирают информацию о предстоящих и прошедших IT-конференциях с внешних площадок (таких как Ontico, HighLoad++ и др.).
+*   **Дашборд и Аналитика:** Удобный веб-интерфейс на базе Django templates для просмотра списка спикеров, оценки NPS, фильтрации и мониторинга событий.
+*   **Скоринг и шорт-листы кандидатов:** Анализ текущей активности спикеров для выбора наиболее подходящих кандидатов на федеральные и профильные конференции.
 
-- Docker + Docker Compose
-- (опционально) Python 3.12, Node.js 20
+---
 
-### Запуск через Docker
+## 🛠 Технологический стек
 
-```bash
-# Скопировать переменные окружения
-cp .env.example .env
+*   **Backend:** Python 3.10+, Django
+*   **База данных:** PostgreSQL 
+*   **Скрапинг и парсинг:** playwright, модули для интеграции с внешними API (например, Tavily).
+*   **Frontend-шаблонизация:** Django Templates (HTML, CSS, JS), базовая аналитика и дашборды.
+*   **Архитектурный подход:** Модульный монолит с перспективой выделения сервисов.
 
-# Поднять все сервисы
-docker compose up --build
-```
+---
 
-Сервисы:
+## 📂 Структура проекта
 
-| Сервис   | URL                        |
-|----------|----------------------------|
-| API      | http://localhost:8000       |
-| API Docs | http://localhost:8000/docs  |
-| DB       | localhost:5432              |
-| Redis    | localhost:6379              |
+Ниже представлено описание ключевых компонентов и файлов, входящих в MVP:
 
-### Миграции БД
+- 📄 **`README.md`** — Эта документация.
+- 📄 **`requirements.txt`** — Список Python-зависимостей проекта.
+- 📁 **`docs/`** — Архитектура проекта и спецификации (например, `architecture.md`).
+- 📁 **`starlift/`** — Основная рабочая директория Django-приложения:
+  - 📄 **`manage.py`** — Утилита командной строки и точка управления Django.
+  - 📁 **`starlift/`** — Ядро приложения (backend):
+    - `settings.py` — Глобальные настройки (подключение БД, middleware).
+    - `models.py` — Описание структуры базы данных (сущности Speaker, Event).
+    - `urls.py` — Маршрутизация роутов API и страниц сайта.
+    - `views.py` — Основная бизнес-логика (работа с данными и рендер шаблонов).
+  - 📁 **`parser/`** — Модули для автоматизированного сбора данных о конференциях:
+    - `parser_highload.py`, `parser_ontico.py`, `ontico_scraper_db.py` — Скраперы для различных IT-мероприятий.
+    - `tavily_parser.py` — Интеграция с внешним API Tavily.
+  - 📁 **`templates/`** — Графический интерфейс, HTML-шаблоны страниц:
+    - Дашборд (`index.html`), аналитика (`analytics.html`), списки и профили (`speakers.html`, `profile.html`, `events.html`).
+  - 📁 **`media/`** — Директория загружаемых пользовательских файлов и фотографий спикеров.
+  - 📁 **`static/`** — Директория статических файлов (темы оформления CSS, скрипты).
 
-```bash
-cd backend
-alembic upgrade head
-```
+---
 
-### Создание первого пользователя
+## ⚙️ Как работает система
 
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email": "admin@company.com", "password": "admin123", "full_name": "Admin", "role": "admin"}'
-```
+1. **Сбор данных:** Автономные скрипты в папке parser/ анализируют сайты ключевых IT-конференций (Ontico, HighLoad) и собирают данные через веб-скрапинг. Полученные данные (спикеры, доклады) подготавливаются и заносятся в основную базу.
+2. **Управление и хранение (Backend):** В models.py приложения описаны базовые сущности:
+   * **Speaker** — содержит специализацию (stack), город, статус, метрику NPS, фотографию и т.д.
+   * **Event** — содержит описание мероприятий, даты, статусы (past / uture) и данные о расписаниях докладов.
+3. **Отображение (Frontend):** Итоговые данные маршрутизируются через iews.py в шаблоны директории 	emplates/. Пользователям (как правило HR/DevRel) предоставляется консоль в виде аналитических графиков (nalytics.html), каталога корпоративных спикеров (speakers.html) и списков конференций.
 
-### Загрузка CSV
+---
 
-Формат файла:
+## 🚀 Установка и запуск (локально)
 
-```
-speaker_name,topic,talk_date,event_title,event_type,city,nps,recording_url,event_url
-Иванов Иван,Микросервисы на Go,2026-01-15,GoConf 2026,external,Москва,85,,https://goconf.ru
-```
+### Требования
+* Python 3.10+
+* PostgreSQL
+* Python benv
 
-## Архитектура
+### Шаги установки:
 
-Подробная документация: [docs/architecture.md](docs/architecture.md)
+> в разработке...
 
-## Структура проекта
-
-```
-StarLift/
-├── backend/          # FastAPI + SQLAlchemy
-│   ├── app/
-│   │   ├── api/      # HTTP роутеры
-│   │   ├── core/     # конфиг, auth, deps
-│   │   ├── models/   # ORM модели
-│   │   ├── schemas/  # Pydantic-схемы
-│   │   ├── services/ # бизнес-логика
-│   │   └── parsers/  # парсеры внешних площадок
-│   └── alembic/      # миграции БД
-├── bot/              # Telegram-бот (aiogram 3)
-├── docs/             # архитектурная документация
-└── docker-compose.yml
-```
-
-## API Endpoints
-
-```
-POST   /api/v1/auth/register
-POST   /api/v1/auth/login
-POST   /api/v1/auth/refresh
-GET    /api/v1/auth/me
-
-GET    /api/v1/speakers
-POST   /api/v1/speakers
-GET    /api/v1/speakers/{id}
-PATCH  /api/v1/speakers/{id}
-
-GET    /api/v1/events
-POST   /api/v1/events
-PATCH  /api/v1/events/{id}
-
-GET    /api/v1/talks
-POST   /api/v1/talks
-PATCH  /api/v1/talks/{id}
-PATCH  /api/v1/talks/{id}/review
-
-POST   /api/v1/import/upload
-
-GET    /api/v1/scores
-GET    /api/v1/scores/{speaker_id}
-POST   /api/v1/scores/recalculate
-
-GET    /api/v1/candidates/lists
-POST   /api/v1/candidates/lists
-GET    /api/v1/candidates/lists/{id}
-POST   /api/v1/candidates/generate
-
-GET    /api/v1/analytics/overview
-
-POST   /api/v1/bot/talks          # internal — from TG bot
-```
+## 📖 Архитектура
+Дополнительная документация и схема архитектуры находятся в docs/architecture.md.

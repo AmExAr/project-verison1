@@ -1,35 +1,37 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STARLIFT</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='50,5 61,35 95,35 68,55 78,85 50,65 22,85 32,55 5,35 39,35' fill='%230A803B'/%3E%3Cpath d='M20,80 L55,45 L65,55 L90,20' fill='none' stroke='white' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --sber-green: #0A803B;
             --sber-green-hover: #08662A;
-            --light-green: #f0fff5;
-            --row-alt-green: rgba(240, 253, 244, 0.6);
-            --bg-color: #F2FBF5;
-            --white: rgba(234, 255, 245, 0.5);
-            --text-main: #14251C;
-            --border-color: rgba(187, 247, 208, 0.6);
+            --light-green: #DDF0E4;
+            --row-alt-green: rgba(221, 240, 228, 0.6);
+            --bg-color: #E6F0EB;
+            --white: rgba(230, 240, 235, 0.5);
+            --text-main: #142C1E;
+            --border-color: rgba(168, 204, 183, 0.6);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);            
-            --text-muted: #70757a;
-            --nav-hover: rgba(240, 242, 245, 0.5);
-            --dropdown-hover: rgba(248, 249, 250, 0.8);
-            --th-bg: rgba(248, 249, 250, 0.6);
-            --tr-hover: rgba(255, 255, 255, 0.5);
-            --mesh-1: #daffe5;
-            --mesh-2: #d8f8e7;
-            --glass-bg: rgba(255, 255, 255, 0.4);
-            --panel-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(224, 224, 224, 0.4);
-            --status-past-bg: rgba(241, 243, 244, 0.8);
-            --status-past-color: #5F6368;
-            --status-future-bg: rgba(232, 245, 233, 0.8);
+            --text-muted: #5B7565;
+            --nav-hover: rgba(216, 232, 223, 0.5);
+            --dropdown-hover: rgba(216, 232, 223, 0.8);
+            --th-bg: rgba(216, 232, 223, 0.6);
+            --tr-hover: rgba(230, 240, 235, 0.5);
+            --mesh-1: #CDE8D7;
+            --mesh-2: #C3E0CB;
+            --glass-bg: rgba(230, 240, 235, 0.4);
+            --panel-bg: rgba(230, 240, 235, 0.85);
+            --glass-border: rgba(168, 204, 183, 0.4);
+            --status-past-bg: rgba(216, 227, 221, 0.8);
+            --status-past-color: #556B5D;
+            --status-future-bg: rgba(193, 224, 203, 0.8);
             --status-future-color: #0A803B;
         }
 
@@ -71,6 +73,30 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--sber-green);
+        }
+        
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
         .mesh-gradient {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -96,7 +122,7 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.25;
+            opacity: 0.1;
             mix-blend-mode: overlay;
             pointer-events: none;
             mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
@@ -122,19 +148,29 @@
             to { opacity: 0; transform: translateY(15px); }
         }
         @keyframes fadeOutOverlay {
-            from { opacity: 1; backdrop-filter: blur(4px); }
-            to { opacity: 0; backdrop-filter: blur(0px); }
+            from { opacity: 1; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); background: rgba(0,0,0,0.3); }
+            to { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
         }
         @keyframes fadeInOverlay {
-            from { opacity: 0; backdrop-filter: blur(0px); }
-            to { opacity: 1; backdrop-filter: blur(4px); }
+            from { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
+            to { opacity: 1; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); background: rgba(0,0,0,0.3); }
         }
         .animate-fade { 
             animation: fadeInUp 0.3s ease both; 
         }
 
+        /* Page Transitions */
+        .page-transition-enter {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .page-transition-leave {
+            animation: fadeOutDown 0.3s ease forwards;
+        }
+
         aside {
             width: 250px;
+            flex-shrink: 0;
             background-color: var(--glass-bg);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
@@ -233,26 +269,55 @@
         }
 
         .theme-toggle {
-            background-color: var(--light-green); border: none; font-size: 20px; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.05), inset 0 2px 2px rgba(255, 255, 255, 0.2);
+            font-size: 20px; 
             color: var(--sber-green); cursor: pointer; 
             width: 42px; height: 42px; border-radius: 50px;
             display: flex; align-items: center; justify-content: center;
             transition: var(--transition);
         }
+        
+        [data-theme="dark"] .theme-toggle {
+            background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2), inset 0 2px 2px rgba(255, 255, 255, 0.05);
+        }
+
         .theme-toggle i {
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         [data-theme="dark"] .theme-toggle i {
             transform: rotate(45deg);
         }
-        .theme-toggle:hover { transform: scale(1.02); filter: brightness(0.95); }
+        .theme-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 16px 0 rgba(31, 38, 135, 0.1), inset 0 2px 2px rgba(255, 255, 255, 0.3); }
+
+        [data-theme="dark"] .theme-toggle:hover { box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.1); }
 
         .admin-profile-container { position: relative; }
         .admin-profile { 
             display: flex; align-items: center; gap: 12px; cursor: pointer; 
-            padding: 6px 16px 6px 20px; border-radius: 50px; background-color: var(--light-green); transition: var(--transition); 
+            padding: 6px 16px 6px 20px; border-radius: 50px; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.05), inset 0 2px 2px rgba(255, 255, 255, 0.2);
+            transition: var(--transition); 
         }
-        .admin-profile:hover { transform: scale(1.02); filter: brightness(0.95); }
+        
+        [data-theme="dark"] .admin-profile {
+            background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2), inset 0 2px 2px rgba(255, 255, 255, 0.05);
+        }
+        
+        .admin-profile:hover { transform: translateY(-2px); box-shadow: 0 6px 16px 0 rgba(31, 38, 135, 0.1), inset 0 2px 2px rgba(255, 255, 255, 0.3); }
+        [data-theme="dark"] .admin-profile:hover { box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.1); }
+
         .admin-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--sber-green); object-fit: cover; }
         .admin-info { display: flex; flex-direction: column; text-align: right; }
         .admin-name { font-size: 14px; font-weight: 600; color: var(--sber-green); }
@@ -260,10 +325,11 @@
 
         .dropdown-menu {
             position: absolute; top: 110%; right: 0; width: 180px;
-            background: var(--white); border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--white) 0%, rgba(255,255,255,0) 100%);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px) saturate(150%);
+            -webkit-backdrop-filter: blur(16px) saturate(150%);
+            border-radius: 16px; box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.15), 0 10px 25px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; overflow: hidden; z-index: 1000;
             opacity: 0; visibility: hidden; transform: translateY(-10px);
             transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s, border-color 0.3s;
@@ -320,6 +386,103 @@
 
         .table-wrapper { border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; color: var(--text-main); }
+
+        .bulk-action-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(10, 128, 59, 0.12), rgba(255, 255, 255, 0.5));
+            border: 1px solid rgba(10, 128, 59, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .bulk-action-bar.show {
+            display: flex;
+        }
+
+        .bulk-action-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .bulk-action-count {
+            min-width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: var(--sber-green);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .bulk-action-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .bulk-checkbox-cell {
+            width: 52px;
+            text-align: center;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            border-radius: 6px;
+            border: 1.5px solid var(--border-color);
+            background: var(--white);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            vertical-align: middle;
+        }
+
+        .custom-checkbox:hover {
+            border-color: var(--sber-green);
+            box-shadow: 0 0 0 4px var(--light-green);
+        }
+
+        .custom-checkbox:checked {
+            background: var(--sber-green);
+            border-color: var(--sber-green);
+        }
+
+        .custom-checkbox:checked::after {
+            content: '\2713';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .custom-checkbox:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px var(--light-green);
+        }
+
+        .table-row-selected {
+            background: rgba(10, 128, 59, 0.08) !important;
+        }
         
         th {
             background-color: var(--th-bg); padding: 14px 16px; font-size: 13px; font-weight: 600;
@@ -426,18 +589,26 @@
             right: 0;
             width: 380px;
             max-width: calc(100vw - 40px);
-            background: var(--panel-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 2px 2px rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            box-shadow: 0 16px 35px rgba(0,0,0,0.12);
             padding: 16px;
             z-index: 1500;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .filters-panel {
+            background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
         }
 
         .filters-panel.show {
@@ -535,8 +706,8 @@
 
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+            position: fixed; inset: -20px;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
             display: none; justify-content: center; align-items: center; z-index: 2000;
             animation: fadeInOverlay 0.3s ease forwards;
         }
@@ -676,15 +847,16 @@
                 <div class="logo-text">STARLIFT</div>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> <span>Главная</span></a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-user-group"></i> <span>Спикеры</span></a>
-                <a href="#" class="nav-item"><i class="fa-regular fa-calendar-days"></i> <span>Мероприятия</span></a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-chart-simple"></i> <span>Аналитика</span></a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> <span>Настройки</span></a>
+                <a href="{% url 'home' %}" class="nav-item"><i class="fa-solid fa-house"></i> <span>Главная</span></a>
+                <a href="{% url 'speakers' %}" class="nav-item"><i class="fa-solid fa-user-group"></i> <span>Спикеры</span></a>
+                <a href="{% url 'events' %}" class="nav-item"><i class="fa-regular fa-calendar-days"></i> <span>Мероприятия</span></a>
+                <a href="{% url 'analytics' %}" class="nav-item"><i class="fa-solid fa-chart-simple"></i> <span>Аналитика</span></a>
+                <a href="{% url 'qr_generator' %}" class="nav-item"><i class="fa-solid fa-qrcode"></i> <span>QR-код</span></a>
+                <a href="{% url 'profile' %}" class="nav-item"><i class="fa-solid fa-gear"></i> <span>Настройки</span></a>
             </nav>
         </div>
         <div class="sidebar-bottom-logo animate-fade" style="animation-delay: 0.5s;">
-            <div class="logo-text" style="font-size: 18px; opacity: 0.5;">FOR SBER</div>
+            <div class="logo-text" style="font-size: 15px; opacity: 0.5;">STARLIFT TEAM</div>
         </div>
     </aside>
 
@@ -703,7 +875,7 @@
                     <i class="fa-solid fa-chevron-down" style="font-size: 12px; color: #70757a;"></i>
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="#" class="dropdown-item"><i class="fa-regular fa-user"></i> Мой профиль</a>
+                    <a href="{% url 'profile' %}" class="dropdown-item"><i class="fa-regular fa-user"></i> Мой профиль</a>
                     <a href="#" class="dropdown-item"><i class="fa-solid fa-headset"></i> Поддержка</a>
                     <hr style="margin: 5px 0; border: 0; border-top: 1px solid var(--border-color);">
                     <a href="#" class="dropdown-item" style="color: #EB5757;"><i class="fa-solid fa-power-off"></i> Выход</a>
@@ -711,162 +883,16 @@
             </div>
         </header>
 
-        <div class="page-header animate-fade" style="text-align: center; margin-bottom: 30px;">
-            <h1 class="page-title">Добро пожаловать в STARLIFT</h1>
-            <p class="page-subtitle">Единое окно для управления экспертами</p>
+        <div id="page-content" class="page-transition-enter">
+            {% block content %}{% endblock %}
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card animate-fade" style="animation-delay: 0.1s;">
-                <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
-                <div class="stat-info"><span class="stat-label">Всего Спикеров</span><div id="totalSpeakersCounter" style="font-size: 24px; font-weight: 700;">0</div></div>
-            </div>
-            <div class="stat-card animate-fade" style="animation-delay: 0.2s;">
-                <div class="stat-icon"><i class="fa-solid fa-microphone"></i></div>
-                <div class="stat-info"><span class="stat-label">Мероприятий</span><div id="totalEventsCounter" style="font-size: 24px; font-weight: 700;">0</div></div>
-            </div>
-        </div>
-
-        <div class="content-block animate-fade" style="animation-delay: 0.4s;">
-            <div class="table-toolbar">
-                <h2 class="table-title">База Спикеров</h2>
-                <div class="search-row">
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="searchInput" placeholder="Поиск...">
-                    </div>
-
-                    <div class="filters-container">
-                        <button type="button" class="filters-toggle" id="filtersToggle" aria-haspopup="dialog" aria-expanded="false">
-                            <i class="fa-solid fa-filter"></i>
-                            Фильтры
-                        </button>
-                        <div class="filters-panel" id="filtersPanel" role="dialog" aria-label="Фильтры">
-                            <div class="filters-panel-title">
-                                <span>Фильтры</span>
-                                <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Esc / клик вне — закрыть</span>
-                            </div>
-                            <div class="filters-grid">
-                                <div class="filter-field">
-                                    <label for="regionFilter">Регион</label>
-                                    <select id="regionFilter" class="select-compact">
-                                        <option value="">Все</option>
-                                    </select>
-                                </div>
-                                <div class="filter-field">
-                                    <label for="stackFilter">Стек</label>
-                                    <select id="stackFilter" class="select-compact">
-                                        <option value="">Все</option>
-                                    </select>
-                                </div>
-                                <div class="filter-field">
-                                    <label for="statusFilter">Статус</label>
-                                    <select id="statusFilter" class="select-compact">
-                                        <option value="all">Все</option>
-                                        <option value="active">Активен</option>
-                                        <option value="inactive">Неактивен</option>
-                                    </select>
-                                </div>
-                                <div class="filter-field">
-                                    <label>NPS</label>
-                                    <div class="nps-range-container">
-                                        <input id="npsMin" class="input-compact" type="number" step="0.1" min="0" max="10" inputmode="decimal" placeholder="Мин. (0-10)">
-                                        <input id="npsMax" class="input-compact" type="number" step="0.1" min="0" max="10" inputmode="decimal" placeholder="Макс. (0-10)">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-wrapper">
-                <table id="speakerTable">
-                    <thead>
-                        <tr>
-                            <th class="sortable" data-col="0" onclick="sortTable(0)">
-                                <span class="th-inner">
-                                    <span>ФИО Спикера</span>
-                                    <span class="sort-indicator hidden" data-indicator-for="0"></span>
-                                </span>
-                            </th>
-                            <th class="sortable" data-col="1" onclick="sortTable(1)">
-                                <span class="th-inner">
-                                    <span>Стек</span>
-                                    <span class="sort-indicator hidden" data-indicator-for="1"></span>
-                                </span>
-                            </th>
-                            <th class="sortable" data-col="2" onclick="sortTable(2)">
-                                <span class="th-inner">
-                                    <span>Регион</span>
-                                    <span class="sort-indicator hidden" data-indicator-for="2"></span>
-                                </span>
-                            </th>
-                            <th class="sortable" data-col="3" onclick="sortTable(3)">
-                                <span class="th-inner">
-                                    <span>Статус</span>
-                                    <span class="sort-indicator hidden" data-indicator-for="3"></span>
-                                </span>
-                            </th>
-                            <th class="sortable" data-col="4" onclick="sortTable(4)">
-                                <span class="th-inner">
-                                    <span>NPS</span>
-                                    <span class="sort-indicator hidden" data-indicator-for="4"></span>
-                                </span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </div>
     </main>
 
-        <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content">
-            <i class="fa-solid fa-xmark modal-close" id="modalClose"></i>
-            <div class="modal-body-split">
-                <div class="modal-left">
-                    <div class="modal-avatar-wrapper">
-                        <img id="modalAvatarImg" src="" alt="Speaker Avatar">
-                        <div class="modal-avatar-name" id="modalAvatarNameText"></div>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn-action btn-like" title="Лайк"><i class="fa-regular fa-heart"></i></button>
-                        <button class="btn-action btn-contact"><i class="fa-regular fa-paper-plane"></i> Связаться</button>
-                    </div>
-                </div>
-                <div class="modal-right">
-                    <h2 style="margin-top: 0; color: var(--text-main); margin-bottom: 20px; font-size: 24px;">Профиль спикера</h2>
-                    
-                    <div class="speaker-detail-grid">
-                        <div class="speaker-detail-item">
-                            <span class="sd-label">Стек</span>
-                            <span class="sd-value" id="modalStackVal"></span>
-                        </div>
-                        <div class="speaker-detail-item">
-                            <span class="sd-label">Город</span>
-                            <span class="sd-value" id="modalCityVal"></span>
-                        </div>
-                        <div class="speaker-detail-item">
-                            <span class="sd-label">NPS</span>
-                            <span class="sd-value" id="modalNpsVal" style="display: flex; align-items: center; gap: 5px;"></span>
-                        </div>
-                        <div class="speaker-detail-item">
-                            <span class="sd-label">Статус</span>
-                            <span class="sd-value" id="modalStatusVal"></span>
-                        </div>
-                    </div>
-
-                    <h3 style="font-size: 16px; border-bottom: 2px solid var(--sber-green); display: inline-block; margin-bottom: 15px; color: var(--text-main);">Мероприятия и доклады</h3>
-                    <div id="eventList"></div>
-                </div>
-            </div>
-        </div>
+    <div id="page-modals">
+        {% block modals %}{% endblock %}
     </div>
 
-    <!-- Подключаем внешнюю базу данных (массив speakersData) -->
-    <script src="speakers.js"></script>
     <script>
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('i');
@@ -899,306 +925,53 @@
         const trigger = document.getElementById('profileTrigger');
         const menu = document.getElementById('dropdownMenu');
         
-        // Массив speakersData берется из подключаемого файла speakers.js
-
-        const sortState = {
-            col: null,
-            dir: 'asc'
-        };
-
-        const searchInput = document.getElementById('searchInput');
-        const filtersToggle = document.getElementById('filtersToggle');
-        const filtersPanel = document.getElementById('filtersPanel');
-
-        const regionFilter = document.getElementById('regionFilter');
-        const stackFilter = document.getElementById('stackFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const npsMin = document.getElementById('npsMin');
-        const npsMax = document.getElementById('npsMax');
-
-        function populateFilters() {
-            const regions = [...new Set(speakersData.map(s => s.city))].sort();
-            
-            const stacksSet = new Set();
-            speakersData.forEach(s => {
-                const parts = s.stack.split(',').map(p => p.trim()).filter(Boolean);
-                parts.forEach(p => stacksSet.add(p));
-            });
-            const stacks = [...stacksSet].sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }));
-
-            regions.forEach(r => {
-                const opt = document.createElement('option');
-                opt.value = r;
-                opt.textContent = r;
-                regionFilter.appendChild(opt);
-            });
-
-            stacks.forEach(st => {
-                const opt = document.createElement('option');
-                opt.value = st;
-                opt.textContent = st;
-                stackFilter.appendChild(opt);
+        if (trigger && menu) {
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('show');
             });
         }
-        populateFilters();
+        document.addEventListener('click', () => {
+            if (menu) menu.classList.remove('show');
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menu) {
+                menu.classList.remove('show');
+            }
+        });
 
-        function normalizeText(v) {
-            return (v ?? '').toString().toLowerCase().trim();
-        }
-
-        function parseNps(value) {
-            if (value === '' || value == null) return null;
-            const n = Number(value);
-            return Number.isFinite(n) ? n : null;
-        }
-
-        function updateSortIndicators() {
-            const indicators = Array.from(document.querySelectorAll('.sort-indicator[data-indicator-for]'));
-            indicators.forEach(ind => {
-                const col = Number(ind.dataset.indicatorFor);
-                if (sortState.col === col) {
-                    ind.innerHTML = sortState.dir === 'asc' ? '<i class="fa-solid fa-arrow-down-long"></i>' : '<i class="fa-solid fa-arrow-up-long"></i>';
-                    ind.classList.remove('hidden');
-                } else {
-                    ind.innerHTML = '<i class="fa-solid fa-arrow-down-long"></i>';
-                    ind.classList.add('hidden');
-                }
-            });
-        }
-
-        function applySort(data) {
-            if (sortState.col == null) return data;
-            const dirFactor = sortState.dir === 'asc' ? 1 : -1;
-
-            const collator = new Intl.Collator('ru', { numeric: true, sensitivity: 'base' });
-            const col = sortState.col;
-
-            return [...data].sort((a, b) => {
-                let av;
-                let bv;
-                switch (col) {
-                    case 0:
-                        av = a.name;
-                        bv = b.name;
-                        return collator.compare(av, bv) * dirFactor;
-                    case 1:
-                        av = a.stack;
-                        bv = b.stack;
-                        return collator.compare(av, bv) * dirFactor;
-                    case 2:
-                        av = a.city;
-                        bv = b.city;
-                        return collator.compare(av, bv) * dirFactor;
-                    case 3:
-                        av = a.status;
-                        bv = b.status;
-                        return collator.compare(av, bv) * dirFactor;
-                    case 4:
-                        av = Number(a.nps);
-                        bv = Number(b.nps);
-                        return (av - bv) * dirFactor;
-                    default:
-                        return 0;
-                }
-            });
-        }
-
-        function matchesSearch(speaker, query) {
-            if (!query) return true;
-
-            return normalizeText(speaker.name).includes(query) ||
-                   normalizeText(speaker.stack).includes(query) ||
-                   normalizeText(speaker.city).includes(query);
-        }
-
-        function matchesRegion(speaker, query) {
-            if (!query) return true;
-            return normalizeText(speaker.city).includes(query);
-        }
-
-        function matchesStack(speaker, query) {
-            if (!query) return true;
-            return normalizeText(speaker.stack).includes(query);
-        }
-
-        function matchesStatus(speaker, filterValue) {
-            if (filterValue === 'all') return true;
-            if (filterValue === 'active') return speaker.status === 'Активен';
-            if (filterValue === 'inactive') return speaker.status === 'Неактивен';
-            return true;
-        }
-
-        function matchesNps(speaker, minVal, maxVal) {
-            const v = Number(speaker.nps);
-            if (!Number.isFinite(v)) return false;
-            if (minVal != null && v < minVal) return false;
-            if (maxVal != null && v > maxVal) return false;
-            return true;
-        }
-
-        function applyFiltersAndRender() {
-            const query = normalizeText(searchInput.value);
-            const regionQ = normalizeText(regionFilter.value);
-            const stackQ = normalizeText(stackFilter.value);
-            const minVal = parseNps(npsMin.value);
-            const maxVal = parseNps(npsMax.value);
-
-            const filtered = speakersData
-                .filter(s => matchesSearch(s, query))
-                .filter(s => matchesRegion(s, regionQ))
-                .filter(s => matchesStack(s, stackQ))
-                .filter(s => matchesStatus(s, statusFilter.value))
-                .filter(s => matchesNps(s, minVal, maxVal));
-
-            const sorted = applySort(filtered);
-            render(sorted);
-            updateSortIndicators();
-        }
-
-        function showEvents(id) {
-            const speaker = speakersData.find(s => s.id === id);
-            
-            document.getElementById('modalAvatarImg').src = `https://i.pravatar.cc/300?img=${speaker.img}`;
-            document.getElementById('modalAvatarNameText').innerText = speaker.name;
-            
-            document.getElementById('modalStackVal').innerText = speaker.stack;
-            document.getElementById('modalCityVal').innerText = speaker.city;
-            document.getElementById('modalNpsVal').innerHTML = `<span style="color: var(--text-main); font-weight: 700;">${speaker.nps}</span> <i class="fa-solid fa-star" style="color: var(--sber-green); font-size: 14px;"></i>`;
-            
-            const statusContainer = document.getElementById('modalStatusVal');
-            statusContainer.innerHTML = `<span class="${speaker.status === 'Активен' ? 'badge-active' : 'badge-inactive'}">${speaker.status}</span>`;
-
-            const list = document.getElementById('eventList');
-            list.innerHTML = speaker.events.map(e => `
-                <div class="event-item">
-                    <span>${e.t}</span>
-                    <span class="status-pill ${e.s}">${e.s === 'past' ? 'Прошло' : 'Будет'}</span>
-                </div>
-            `).join('') || '<p style="color: var(--text-muted); font-size: 14px;">Записей не найдено</p>';
-            
-            document.getElementById('modalOverlay').style.display = 'flex';
-        }
-
-        function closeModal() {
-            const overlay = document.getElementById('modalOverlay');
+        window.closeAnyModal = function(overlay) {
+            if (!overlay) return;
             overlay.classList.add('closing');
             setTimeout(() => {
                 overlay.style.display = 'none';
                 overlay.classList.remove('closing');
             }, 280);
-        }
-
-        document.getElementById('modalClose').onclick = closeModal;
-        
-        document.getElementById('modalOverlay').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('modalOverlay')) {
-                closeModal();
-            }
-        });
-
-        function render(data) {
-            const body = document.getElementById('tableBody');
-            
-            // Обновляем статистику на основе отображаемых данных
-            const totalSpeakers = data.length;
-            let totalEvents = 0;
-            data.forEach(s => {
-                if (s.events) {
-                    totalEvents += s.events.length;
-                }
-            });
-            document.getElementById('totalSpeakersCounter').textContent = totalSpeakers;
-            document.getElementById('totalEventsCounter').textContent = totalEvents;
-
-            body.innerHTML = data.map((s, i) => `
-                <tr class="${i % 2 !== 0 ? 'alt-row' : ''}" onclick="showEvents(${s.id})">
-                    <td>
-                        <div class="speaker-info">
-                            <img src="https://i.pravatar.cc/150?img=${s.img}" class="avatar">
-                            <div><strong>${s.name}</strong><br><small style="color:var(--text-muted)">${s.sub}</small></div>
-                        </div>
-                    </td>
-                    <td>${s.stack}</td>
-                    <td>${s.city}</td>
-                    <td><span class="${s.status === 'Активен' ? 'badge-active' : 'badge-inactive'}">${s.status}</span></td>
-                    <td><div class="nps-val">${s.nps} <i class="fa-solid fa-star"></i></div></td>
-                </tr>
-            `).join('');
-        }
-
-        function sortTable(colIndex) {
-            if (sortState.col === colIndex) {
-                sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortState.col = colIndex;
-                sortState.dir = 'asc';
-            }
-            applyFiltersAndRender();
-        }
-
-        // expose for inline onclick
-        window.sortTable = sortTable;
-        window.showEvents = showEvents;
-
-        function closeFiltersPanel() {
-            filtersPanel.classList.remove('show');
-            filtersToggle.setAttribute('aria-expanded', 'false');
-        }
-
-        function toggleFiltersPanel() {
-            const isOpen = filtersPanel.classList.toggle('show');
-            filtersToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        }
-
-        trigger.onclick = (e) => {
-            e.stopPropagation();
-            menu.classList.toggle('show');
-            closeFiltersPanel();
         };
 
-        filtersToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menu.classList.remove('show');
-            toggleFiltersPanel();
-        });
+        document.addEventListener('click', (e) => {
+            const closeBtn = e.target.closest('.modal-close');
+            if (closeBtn) {
+                const overlay = closeBtn.closest('.modal-overlay') || document.querySelector('.modal-overlay[style*="display: flex"]');
+                if (overlay) window.closeAnyModal(overlay);
+                return;
+            }
 
-        filtersPanel.addEventListener('click', (e) => e.stopPropagation());
-
-        document.addEventListener('click', () => {
-            menu.classList.remove('show');
-            closeFiltersPanel();
+            if (e.target.classList.contains('modal-overlay')) {
+                window.closeAnyModal(e.target);
+            }
         });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                menu.classList.remove('show');
-                closeFiltersPanel();
-                const overlay = document.getElementById('modalOverlay');
-                if (overlay && overlay.style.display === 'flex') {
-                    closeModal();
-                }
+                const overlays = document.querySelectorAll('.modal-overlay[style*="display: flex"]');
+                overlays.forEach(ov => window.closeAnyModal(ov));
             }
-        });
-
-        [searchInput, regionFilter, stackFilter, statusFilter, npsMin, npsMax].forEach(el => {
-            el.addEventListener('input', applyFiltersAndRender);
-            el.addEventListener('change', applyFiltersAndRender);
-        });
-
-        // NPS input validation (0-10)
-        [npsMin, npsMax].forEach(el => {
-            el.addEventListener('input', function() {
-                if (this.value !== '') {
-                    let val = parseFloat(this.value);
-                    if (val < 0) this.value = 0;
-                    if (val > 10) this.value = 10;
-                }
-            });
         });
 
         // Генерация частиц для фона
         const particlesContainer = document.getElementById('particlesContainer');
-        const particleCount = 250; // Количество частиц
+        const particleCount = 50; // Количество частиц
         
         for (let i = 0; i < particleCount; i++) {
             const particle = document.createElement('div');
@@ -1236,7 +1009,121 @@
             particlesContainer.appendChild(particle);
         }
 
-        applyFiltersAndRender();
+        // --- SPA Navigation ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const pageContent = document.getElementById('page-content');
+            
+            // Обработка кликов по ссылкам в навигации
+            document.body.addEventListener('click', async (e) => {
+                const link = e.target.closest('a.nav-item');
+                
+                if (link && link.href && link.href.startsWith(window.location.origin)) {
+                    e.preventDefault();
+                    const url = link.href;
+
+                    if (url === window.location.href) return;
+
+                    await navigateTo(url);
+                    window.history.pushState({}, '', url);
+                    updateNavActive(url);
+                }
+            });
+
+            // Обработка кнопок "Вперед/Назад" в браузере
+            window.addEventListener('popstate', async () => {
+                await navigateTo(window.location.href);
+                updateNavActive(window.location.href);
+            });
+
+            async function navigateTo(url) {
+                // 1. Анимация затухания старого контента
+                pageContent.classList.remove('page-transition-enter');
+                pageContent.classList.add('page-transition-leave');
+
+                try {
+                    // Ждем завершения анимации исчезновения
+                    await new Promise(resolve => setTimeout(resolve, 300)); 
+
+                    // 2. Загрузка новой страницы
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const htmlString = await response.text();
+
+                    // 3. Парсинг HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlString, 'text/html');
+                    const newContent = doc.getElementById('page-content');
+                    const newModals = doc.getElementById('page-modals');
+
+                    if (newContent) {
+                        // Заменяем заголовок документа (title)
+                        document.title = doc.title;
+                        
+                        // Вставляем новый контент
+                        pageContent.innerHTML = newContent.innerHTML;
+
+                        // Вставляем новые модальные окна
+                        if (newModals) {
+                            const currentModals = document.getElementById('page-modals');
+                            if (currentModals) {
+                                currentModals.innerHTML = newModals.innerHTML;
+                                executeInlineScripts(currentModals);
+                            }
+                        }
+
+                        // 4. Переинициализация скриптов
+                        executeInlineScripts(pageContent);
+
+                        // Запускаем кастомное событие для скриптов, ожидающих загрузки контента
+                        document.dispatchEvent(new Event('spa-page-loaded'));
+                    } else {
+                        // Резервный вариант, если что-то пошло не так
+                        window.location.href = url;
+                        return;
+                    }
+
+                    // 5. Анимация появления
+                    pageContent.classList.remove('page-transition-leave');
+                    void pageContent.offsetWidth; // Триггер reflow для перезапуска CSS-анимации
+                    pageContent.classList.add('page-transition-enter');
+
+                } catch (error) {
+                    console.error('Ошибка загрузки страницы:', error);
+                    window.location.href = url; // Фолбэк на обычный переход при ошибке
+                }
+            }
+
+            function updateNavActive(url) {
+                const path = new URL(url).pathname;
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    const itemPath = new URL(item.href).pathname;
+                    if (path === itemPath) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+
+            // Вставляет скрипты заново для их реального выполнения браузером
+            function executeInlineScripts(container) {
+                const scripts = container.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    if (oldScript.src) {
+                        // Если скрипт внешний
+                        newScript.src = oldScript.src;
+                    } else {
+                        // Если скрипт инлайновый
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    }
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+            }
+        });
+
     </script>
 </body>
 </html>

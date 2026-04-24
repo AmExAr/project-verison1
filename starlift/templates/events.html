@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .events-page {
+        display: grid;
+        gap: 20px;
+    }
+
+    .events-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .events-title {
+        margin: 0;
+        font-size: clamp(28px, 3vw, 40px);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--text-main);
+    }
+
+    .events-subtitle {
+        margin: 8px 0 0;
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .event-card-large {
+        position: relative;
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        background: var(--glass-bg);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .event-card-large:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .event-card-large:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 30px rgba(10,128,59,0.08);
+        border-color: rgba(10,128,59,0.2);
+    }
+
+    .event-card-large::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(10,128,59,0.12), transparent 45%);
+        opacity: 0;
+        transition: var(--transition);
+        pointer-events: none;
+    }
+
+    .event-card-large:hover::after {
+        opacity: 1;
+    }
+
+    .event-card-large > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .event-card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .event-date-box {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .event-date-main {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .event-date-sub {
+        color: var(--text-muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+    }
+
+    .event-title-card {
+        margin: 0 0 10px;
+        font-size: 20px;
+        line-height: 1.35;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .event-description-card {
+        margin: 0 0 18px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .stacked-avatars {
+        display: flex;
+        align-items: center;
+    }
+
+    .stacked-avatars .avatar {
+        width: 40px;
+        height: 40px;
+        margin-left: -10px;
+        border: 2px solid var(--panel-bg);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    }
+
+    .stacked-avatars .avatar:first-child {
+        margin-left: 0;
+    }
+
+    .event-card-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .speaker-count {
+        font-size: 13px;
+        color: var(--text-main);
+        font-weight: 600;
+    }
+
+    .event-modal-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+        gap: 20px;
+        margin-top: 8px;
+    }
+
+    .event-modal-section {
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--border-color);
+        background: var(--panel-bg);
+        transition: var(--transition);
+    }
+
+    .event-modal-section:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .event-modal-title {
+        margin: 0 0 12px;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .schedule-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .schedule-item {
+        display: grid;
+        grid-template-columns: 74px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 12px;
+        border-radius: 14px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+    
+    .schedule-item:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .schedule-time {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--sber-green);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .schedule-text {
+        font-size: 14px;
+        color: var(--text-main);
+        line-height: 1.5;
+    }
+
+    .speaker-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+
+    .speaker-chip:active {
+        transform: scale(0.98);
+        backdrop-filter: blur(12px);
+    }
+
+    .speaker-chip .avatar {
+        width: 34px;
+        height: 34px;
+    }
+
+    .speaker-chip strong {
+        display: block;
+        font-size: 14px;
+        color: var(--text-main);
+    }
+
+    .speaker-chip span {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    @media (max-width: 960px) {
+        .events-grid,
+        .event-modal-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="events-page">
+    <div class="events-header animate-fade">
+        <div>
+            <h1 class="events-title">Мероприятия</h1>
+            <p class="events-subtitle">Карточки ближайших и прошедших событий с подробным просмотром</p>
+        </div>
+        <span class="badge-active" id="activeEventsBadge"><i class="fa-solid fa-calendar-days"></i> Загрузка...</span>
+    </div>
+
+    <div class="events-grid" id="eventsContainer">
+    <!-- Данные будут загружены динамически -->
+</div>
+</div>
+
+<script>
+let eventsDataCache = {};
+
+async function fetchEvents() {
+    try {
+        const response = await fetch('/api/events/');
+        const events = await response.json();
+        
+        const container = document.getElementById('eventsContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        let activeCount = 0;
+
+        events.forEach(ev => {
+            eventsDataCache[ev.id] = ev;
+            
+            const statusClass = ev.status === 'past' ? 'badge-inactive' : 'badge-active';
+            const statusText = ev.status === 'past' ? 'Прошедшее' : 'Предстоящее';
+            
+            if (ev.status !== 'past') {
+                activeCount++;
+            }
+            
+            const card = document.createElement('article');
+            card.className = 'event-card-large';
+            card.dataset.eventId = ev.id;
+            
+            let cardLink = '';
+            if (ev.link && ev.link !== 'None' && ev.link !== '') {
+                cardLink = `<a href="${ev.link}" target="_blank" style="color: var(--sber-green); font-weight: 600; text-decoration: none;">Перейти на сайт</a>`;
+            }
+
+            let desc = ev.description && ev.description !== 'None' ? ev.description : '';
+            if (desc.length > 120) desc = desc.substring(0, 120) + '...';
+
+            card.innerHTML = `
+                <div class="event-card-top">
+                    <div class="event-date-box">
+                        <span class="event-date-main">${ev.date && ev.date !== 'None' ? ev.date : 'Дата не указана'}</span>
+                        <span class="event-date-sub">${ev.location && ev.location !== 'None' ? ev.location : 'Онлайн'}</span>
+                    </div>
+                    <span class="${statusClass}">${statusText}</span>
+                </div>
+                <h2 class="event-title-card" style="margin-top: 10px;">${ev.title}</h2>
+                <p class="event-description-card">${desc}</p>
+                <div class="event-card-bottom" style="margin-top:auto;">
+                    ${cardLink}
+                </div>
+            `;
+            
+            card.addEventListener('click', () => openEventModal(ev.id));
+            container.appendChild(card);
+        });
+
+        const activeBadge = document.getElementById('activeEventsBadge');
+        if (activeBadge) {
+            let noun = 'мероприятий';
+            if (activeCount % 10 === 1 && activeCount % 100 !== 11) {
+                noun = 'мероприятие';
+            } else if ([2, 3, 4].includes(activeCount % 10) && ![12, 13, 14].includes(activeCount % 100)) {
+                noun = 'мероприятия';
+            }
+            activeBadge.innerHTML = `<i class="fa-solid fa-calendar-days"></i> ${activeCount} предстоящих ${noun}`;
+        }
+    } catch(err) {
+        console.error('Error fetching events:', err);
+    }
+}
+
+function renderEventModal(eventId) {
+    const ev = eventsDataCache[eventId];
+    if (!ev) return;
+
+    const statusClass = ev.status === 'past' ? 'badge-inactive' : 'badge-active';
+    const statusText = ev.status === 'past' ? 'Завершено' : 'Запланировано';
+
+    const badge = document.getElementById('eventStatusBadge');
+    if (badge) {
+        badge.className = statusClass;
+        badge.textContent = statusText;
+    }
+    
+    document.getElementById('eventModalTitle').textContent = ev.title;
+    document.getElementById('eventModalDescription').textContent = ev.description && ev.description !== 'None' ? ev.description : 'Описание отсутствует';
+    
+    const coverAvatar = document.getElementById('eventCoverAvatar');
+    if (coverAvatar) coverAvatar.style.display = 'none';
+    
+    document.getElementById('eventLocationLine').textContent = ev.location && ev.location !== 'None' ? ev.location : 'Онлайн/Офлайн';
+    document.getElementById('eventCountLine').textContent = ev.date && ev.date !== 'None' ? ev.date : 'Дата уточняется';
+    
+    let formatHtml = 'Информация недоступна';
+    if(ev.link && ev.link !== 'None') {
+        formatHtml = `<a href="${ev.link}" target="_blank">Перейти по ссылке</a>`;
+    }
+    document.getElementById('eventFormatLine').innerHTML = formatHtml;
+
+    document.getElementById('eventSpeakersList').innerHTML = '<p style="color:var(--text-muted);font-size:14px;">Информация по спикерам уточняется.</p>';
+    
+    let scheduleHtml = '<p style="color:var(--text-muted);font-size:14px;">Смотрите подробное расписание на официальном сайте мероприятия.</p>';
+    if (ev.schedule && ev.schedule !== 'None' && ev.schedule.trim() !== '') {
+        scheduleHtml = ev.schedule;
+    }
+    document.getElementById('eventScheduleList').innerHTML = scheduleHtml;
+}
+
+function openEventModal(eventId) {
+    renderEventModal(eventId);
+    const overlay = document.getElementById('eventModalOverlay');
+    if (overlay) overlay.style.display = 'flex';
+}
+
+function initEventsPage() {
+    fetchEvents();
+}
+
+initEventsPage();
+document.addEventListener('spa-page-loaded', () => {
+    if (document.getElementById('eventModalOverlay')) {
+        initEventsPage();
+    }
+});
+</script>
+{% endblock %}
+
+{% block modals %}
+    <div class="modal-overlay" id="eventModalOverlay">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark modal-close" id="eventModalClose"></i>
+            <div class="event-modal-grid">
+                <div class="event-modal-section">
+                    <div class="badge-active" id="eventStatusBadge" style="display:inline-flex; margin-bottom:12px;"></div>
+                    <h2 class="event-modal-title" id="eventModalTitle"></h2>
+                    <p class="events-subtitle" id="eventModalDescription"></p>
+
+                    <div style="display:grid; gap:12px; margin-top:18px;">
+                        <div class="speaker-chip">
+                            <img class="avatar" id="eventCoverAvatar" src="" alt="Cover avatar">
+                            <div>
+                                <strong id="eventLocationLine"></strong>
+                                <span id="eventCountLine"></span>
+                            </div>
+                        </div>
+                        <div class="speaker-chip">
+                            <div class="avatar" style="background: var(--sber-green); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800;">...</div>
+                            <div>
+                                <strong>Подробнее</strong>
+                                <span id="eventFormatLine"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-modal-section">
+                    <h3 class="section-title" style="margin-bottom: 14px; font-size: 18px;"><i class="fa-solid fa-microphone-lines"></i> Утвержденные спикеры</h3>
+                    <div id="eventSpeakersList" style="display:grid; gap:10px;"></div>
+
+                    <h3 class="section-title" style="margin: 18px 0 14px; font-size: 18px;"><i class="fa-solid fa-clock"></i> Расписание</h3>
+                    <div class="schedule-list" id="eventScheduleList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

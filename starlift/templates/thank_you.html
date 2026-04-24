@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Спасибо за ваш отзыв! | StarLift{% endblock %}
+
+{% block content %}
+<style>
+    .thank-you-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .success-icon {
+        font-size: 80px;
+        color: var(--cyan-color, #00ffff);
+        margin-bottom: 20px;
+        animation: scale-up 0.5s ease-out;
+    }
+
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+
+    .subtitle {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.7);
+        max-width: 400px;
+        margin-bottom: 40px;
+        line-height: 1.5;
+    }
+
+    .home-btn {
+        background: transparent;
+        color: var(--cyan-color, #00ffff);
+        border: 2px solid var(--cyan-color, #00ffff);
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .home-btn:hover {
+        background: var(--cyan-color, #00ffff);
+        color: #000;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    }
+
+    @keyframes scale-up {
+        0% { transform: scale(0); opacity: 0; }
+        80% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+
+<div class="thank-you-container">
+    <div class="success-icon">✨</div>
+    <div class="title">Спасибо!</div>
+    <div class="subtitle">Ваш отзыв успешно сохранен. Он поможет нам сделать следующие мероприятия еще круче!</div>
+    <a href="{% url 'home' %}" class="home-btn">На главную</a>
+</div>
+{% endblock %}

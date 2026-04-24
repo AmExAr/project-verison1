@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .analytics-page {
+        display: grid;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .analytics-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .analytics-kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .metric-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .metric-label {
+        font-size: 14px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .metric-value {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--sber-green);
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+    }
+    
+    @media (max-width: 1024px) {
+        .analytics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .panel {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+    }
+
+    .top-speakers-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .top-speakers-table th, .top-speakers-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .top-speakers-table th {
+        background: var(--th-bg);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 12px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .top-speakers-table tr:hover {
+        background: var(--tr-hover);
+    }
+
+    .speaker-link {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .speaker-link:hover {
+        color: var(--sber-green);
+    }
+
+    .score-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: var(--light-green);
+        color: var(--sber-green-hover);
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .chart-container {
+        position: relative;
+        flex-grow: 1;
+        min-height: 250px;
+        width: 100%;
+    }
+</style>
+
+<div class="analytics-page animate-fade">
+    <div class="analytics-header">
+        <h1 class="analytics-title">Общая аналитика</h1>
+    </div>
+
+    <!-- Общие KPI -->
+    <div class="analytics-kpis">
+        <div class="metric-card">
+            <div class="metric-label">Всего отзывов</div>
+            <div class="metric-value">{{ total_feedbacks }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Средний балл</div>
+            <div class="metric-value">{{ average_score|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+        <!-- Топ спикеров -->
+        <div class="panel">
+            <div class="panel-title"><i class="fa-solid fa-trophy" style="color: var(--sber-green); margin-right: 8px;"></i>Топ лучших спикеров</div>
+            <div style="overflow-x: auto;">
+                <table class="top-speakers-table">
+                    <thead>
+                        <tr>
+                            <th>Спикер</th>
+                            <th>Средний балл</th>
+                            <th>Отзывов</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for speaker in top_speakers %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'speakers' %}?id={{ speaker.id }}" class="speaker-link">{{ speaker.name }}</a>
+                            </td>
+                            <td>
+                                <span class="score-badge">{{ speaker.avg_score|floatformat:2 }}</span>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 14px;">{{ speaker.feedbacks_count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 20px;">Нет данных о спикерах с отзывами</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- График распределения -->
+        <div class="panel">
+            <div class="panel-title"><i class="fa-solid fa-chart-pie" style="color: var(--sber-green); margin-right: 8px;"></i>Распределение оценок</div>
+            <div class="chart-container">
+                <canvas id="scoreChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const canvas = document.getElementById('scoreChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        // Prepare data from Django context
+        const labelsData = [
+            {% for score, count in score_distribution.items %}
+                '{{ score }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        const countsData = [
+            {% for score, count in score_distribution.items %}
+                {{ count }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDarkTheme ? '#A0A5AA' : '#5B7565';
+        const mainColor = '#0A803B'; // sber-green
+        const bgColor = isDarkTheme ? 'rgba(33, 160, 56, 0.4)' : 'rgba(10, 128, 59, 0.4)';
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsData.reverse(),
+                datasets: [{
+                    label: 'Количество оценок',
+                    data: countsData.reverse(),
+                    backgroundColor: bgColor,
+                    borderColor: mainColor,
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return 'Оценка: ' + context[0].label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            color: textColor
+                        },
+                        grid: {
+                            color: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

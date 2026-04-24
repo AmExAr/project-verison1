@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: var(--panel-bg);
+        border-radius: 18px;
+        padding: 30px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 18px 35px rgba(0,0,0,0.12);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+    
+    .form-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin-top: 0;
+        margin-bottom: 24px;
+        color: var(--text-main);
+    }
+    
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        background: var(--bg-main);
+        color: var(--text-main);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        justify-content: flex-end;
+    }
+
+    .dropzone-wrapper {
+        border: 2px dashed var(--sber-green);
+        border-radius: 18px;
+        background: var(--panel-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 30px;
+        text-align: center;
+        transition: var(--transition);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .dropzone-wrapper.dragover {
+        background: rgba(33, 160, 56, 0.1);
+        border-color: var(--text-main);
+    }
+
+    .dropzone-content {
+        pointer-events: none;
+    }
+
+    .dropzone-content i {
+        font-size: 32px;
+        color: var(--sber-green);
+        margin-bottom: 12px;
+    }
+
+    .dropzone-preview {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 18px;
+        margin-top: 15px;
+        display: none;
+        object-fit: cover;
+    }
+
+    .url-input-wrapper {
+        margin-top: 15px;
+        text-align: left;
+    }
+</style>
+
+<div class="form-container animate-fade">
+    <h2 class="form-title">{{ title }}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Фотография (до 10 МБ, JPG/PNG/WEBP)</label>
+            <div class="dropzone-wrapper" id="dropzone">
+                <div class="dropzone-content" id="dropzoneContent">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p>Перетащите фото сюда или нажмите</p>
+                </div>
+                <img id="imagePreview" class="dropzone-preview" alt="Превью" {% if form.instance.img %}src="{% if form.instance.img|slice:':4' == 'http' or form.instance.img|slice:':6' == '/media' %}{{ form.instance.img }}{% else %}https://i.pravatar.cc/300?img={{ form.instance.img }}{% endif %}" style="display:inline-block;"{% endif %}>
+                <input type="file" name="upload_image" id="id_upload_image" style="display: none;" accept="image/jpeg, image/png, image/webp">
+            </div>
+            
+            <div class="url-input-wrapper">
+                <label>Или вставьте ссылку на изображение</label>
+                <input type="url" name="image_url" class="search-box" style="width: 100%; border-radius: 12px; padding: 10px; border: 1px solid var(--glass-border); background: var(--bg-main);" placeholder="https://example.com/image.jpg" id="id_image_url">
+            </div>
+            
+            {% if form.upload_image.errors %}
+                <div style="color: red; font-size: 12px; margin-top: 4px;">{{ form.upload_image.errors }}</div>
+            {% endif %}
+            {% if form.image_url.errors %}
+                <div style="color: red; font-size: 12px; margin-top: 4px;">{{ form.image_url.errors }}</div>
+            {% endif %}
+        </div>
+
+        {% for field in form %}
+            {% if field.name != 'upload_image' and field.name != 'image_url' %}
+            <div class="form-group" {% if field.name == 'img' %}style="display: none;"{% endif %}>
+                {% if field.name != 'img' %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% endif %}
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color: red; font-size: 12px; margin-top: 4px;">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% endfor %}
+        <div class="form-actions">
+            <a href="{% url 'speakers' %}" class="btn-action btn-contact" style="background: var(--panel-bg);"><i class="fa-solid fa-xmark"></i> Отмена</a>
+            <button type="submit" class="btn-action btn-contact"><i class="fa-solid fa-check"></i> Сохранить</button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('id_upload_image');
+    const urlInput = document.getElementById('id_image_url');
+    const preview = document.getElementById('imagePreview');
+    const dropzoneContent = document.getElementById('dropzoneContent');
+
+    dropzone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropzone.classList.add('dragover');
+    }
+
+    function unhighlight(e) {
+        dropzone.classList.remove('dragover');
+    }
+
+    dropzone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files && files.length > 0) {
+            fileInput.files = files;
+            handleFiles(files);
+        }
+    }
+
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            handleFiles(this.files);
+        }
+    });
+    
+    urlInput.addEventListener('input', function() {
+        if (this.value) {
+            showPreview(this.value);
+            fileInput.value = ''; // clear file if url is entered
+        } else {
+            preview.style.display = 'none';
+            dropzoneContent.style.display = 'block';
+        }
+    });
+
+    function handleFiles(files) {
+        const file = files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = e => showPreview(e.target.result);
+            reader.readAsDataURL(file);
+            urlInput.value = ''; // clear url if file is selected
+        }
+    }
+
+    function showPreview(src) {
+        preview.src = src;
+        preview.style.display = 'inline-block';
+        dropzoneContent.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
