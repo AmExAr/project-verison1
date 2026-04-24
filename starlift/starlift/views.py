@@ -152,7 +152,7 @@ def speakers_api(request):
                 "stack": speaker.stack,
                 "city": speaker.city,
                 "status": speaker.status,
-                "nps": float(speaker.nps) if speaker.nps else 0.0,
+                "nps": int(speaker.nps) if speaker.nps else 0,
                 "img": speaker.img,
                 "events": [{"t": e.title, "s": e.status} for e in speaker.events.all()],
                 "feedbacks": feedbacks_data

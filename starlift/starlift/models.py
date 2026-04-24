@@ -8,11 +8,19 @@ class Speaker(models.Model):
     stack = models.CharField(max_length=200)
     city = models.CharField(max_length=100)
     status = models.CharField(max_length=50)
-    nps = models.DecimalField(max_digits=4, decimal_places=1)
+    nps = models.IntegerField(default=0)
     img = models.CharField(max_length=100)
 
     class Meta:
         db_table = 'starlift_speaker'
+
+    @property
+    def avatar_url(self):
+        if self.img:
+            if self.img.startswith('/media/') or self.img.startswith('http'):
+                return self.img
+            return f"https://i.pravatar.cc/150?img={self.img}"
+        return ""
 
     def calculate_nps(self, event_id=None):
         qs = self.feedbacks.all()
@@ -28,10 +36,10 @@ class Speaker(models.Model):
         total = stats['total']
 
         if total == 0:
-            return None
+            return 0  # Возвращаем 0, если нет отзывов
             
-        nps = ((stats['promoters'] - stats['detractors']) / total) * 100
-        return round(nps, 1)
+        nps_score = ((stats['promoters'] - stats['detractors']) / total) * 100
+        return int(round(nps_score))
 
     def __str__(self):
         return self.name
@@ -72,3 +80,11 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"Feedback for {self.speaker.name} at {self.event.title} - Score: {self.score}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Пересчитываем NPS для спикера при каждом новом отзыве
+        nps_value = self.speaker.calculate_nps()
+        if nps_value is not None:
+            self.speaker.nps = nps_value
+            self.speaker.save(update_fields=['nps'])
