@@ -40,6 +40,7 @@ def parse_abstracts(url: str, out: str):
             authors = {}
             
             title = report.find("h2", class_="thesis__item-title").find("a", class_="thesis__item-title-link")
+            link = BASE_URL + title.get("href")
             
             if report.find("div", class_="thesis__tags") is not None:
                 for stack in report.find("div", class_="thesis__tags").find_all("div", recursive=False):
@@ -70,7 +71,7 @@ def parse_abstracts(url: str, out: str):
                         "date": date,
                         "stack": ", ".join(stacks),
                         "description": description,
-                        "link": title.get("href"),
+                        "link": link,
                     }
                 )
     f.close()        
